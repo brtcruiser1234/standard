@@ -1,0 +1,13 @@
+tunnel: m900-ssh
+credentials-file: /home/brandon/.cloudflared/4afbda9b-6542-4b5b-8e49-128ec7c20ed7.json
+
+ingress:
+  - hostname: jazzlive.taylorshome.cc
+    service: http://localhost:8888
+  - hostname: nhlteams.taylorshome.cc
+    service: http://localhost:3050
+  - hostname: m900.taylorshome.cc
+    service: https://localhost:9090
+    originRequest:
+      noTLSVerify: true
+  - service: http_status:404
