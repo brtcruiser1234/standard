@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  nhl-team-tracker:
+    build: .
+    container_name: nhl-team-tracker
+    ports:
+      - "3050:3000"  # Host port 3050 → Container port 3000
+    restart: unless-stopped
+    labels:
+      - "description=NHL Team Tracker - Multi-team Live Stats Dashboard with CORS Proxy"

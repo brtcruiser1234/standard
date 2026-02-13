@@ -1,0 +1,326 @@
+{
+  "teams": [
+    {
+      "abbrev": "ANA",
+      "id": 24,
+      "name": "Anaheim Ducks",
+      "city": "Anaheim",
+      "teamName": "Ducks",
+      "color": "#F47A38",
+      "division": "Pacific",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "BOS",
+      "id": 6,
+      "name": "Boston Bruins",
+      "city": "Boston",
+      "teamName": "Bruins",
+      "color": "#FFB81C",
+      "division": "Atlantic",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "BUF",
+      "id": 7,
+      "name": "Buffalo Sabres",
+      "city": "Buffalo",
+      "teamName": "Sabres",
+      "color": "#002654",
+      "division": "Atlantic",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "CAR",
+      "id": 12,
+      "name": "Carolina Hurricanes",
+      "city": "Carolina",
+      "teamName": "Hurricanes",
+      "color": "#CC0000",
+      "division": "Metropolitan",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "CBJ",
+      "id": 29,
+      "name": "Columbus Blue Jackets",
+      "city": "Columbus",
+      "teamName": "Blue Jackets",
+      "color": "#002654",
+      "division": "Metropolitan",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "CGY",
+      "id": 20,
+      "name": "Calgary Flames",
+      "city": "Calgary",
+      "teamName": "Flames",
+      "color": "#C8102E",
+      "division": "Pacific",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "CHI",
+      "id": 16,
+      "name": "Chicago Blackhawks",
+      "city": "Chicago",
+      "teamName": "Blackhawks",
+      "color": "#CF0A2C",
+      "division": "Central",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "COL",
+      "id": 21,
+      "name": "Colorado Avalanche",
+      "city": "Colorado",
+      "teamName": "Avalanche",
+      "color": "#6F263D",
+      "division": "Central",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "DAL",
+      "id": 25,
+      "name": "Dallas Stars",
+      "city": "Dallas",
+      "teamName": "Stars",
+      "color": "#006847",
+      "division": "Central",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "DET",
+      "id": 17,
+      "name": "Detroit Red Wings",
+      "city": "Detroit",
+      "teamName": "Red Wings",
+      "color": "#CE1126",
+      "division": "Atlantic",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "EDM",
+      "id": 22,
+      "name": "Edmonton Oilers",
+      "city": "Edmonton",
+      "teamName": "Oilers",
+      "color": "#FF4C00",
+      "division": "Pacific",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "FLA",
+      "id": 13,
+      "name": "Florida Panthers",
+      "city": "Florida",
+      "teamName": "Panthers",
+      "color": "#041E42",
+      "division": "Atlantic",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "LAK",
+      "id": 26,
+      "name": "Los Angeles Kings",
+      "city": "Los Angeles",
+      "teamName": "Kings",
+      "color": "#111111",
+      "division": "Pacific",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "MIN",
+      "id": 30,
+      "name": "Minnesota Wild",
+      "city": "Minnesota",
+      "teamName": "Wild",
+      "color": "#154734",
+      "division": "Central",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "MTL",
+      "id": 8,
+      "name": "Montreal Canadiens",
+      "city": "Montreal",
+      "teamName": "Canadiens",
+      "color": "#AF1E2D",
+      "division": "Atlantic",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "NSH",
+      "id": 18,
+      "name": "Nashville Predators",
+      "city": "Nashville",
+      "teamName": "Predators",
+      "color": "#FFB81C",
+      "division": "Central",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "NJD",
+      "id": 1,
+      "name": "New Jersey Devils",
+      "city": "New Jersey",
+      "teamName": "Devils",
+      "color": "#CE1126",
+      "division": "Metropolitan",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "NYI",
+      "id": 2,
+      "name": "New York Islanders",
+      "city": "New York",
+      "teamName": "Islanders",
+      "color": "#00539B",
+      "division": "Metropolitan",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "NYR",
+      "id": 3,
+      "name": "New York Rangers",
+      "city": "New York",
+      "teamName": "Rangers",
+      "color": "#0038A8",
+      "division": "Metropolitan",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "OTT",
+      "id": 9,
+      "name": "Ottawa Senators",
+      "city": "Ottawa",
+      "teamName": "Senators",
+      "color": "#C52032",
+      "division": "Atlantic",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "PHI",
+      "id": 4,
+      "name": "Philadelphia Flyers",
+      "city": "Philadelphia",
+      "teamName": "Flyers",
+      "color": "#F74902",
+      "division": "Metropolitan",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "PIT",
+      "id": 5,
+      "name": "Pittsburgh Penguins",
+      "city": "Pittsburgh",
+      "teamName": "Penguins",
+      "color": "#000000",
+      "division": "Metropolitan",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "SEA",
+      "id": 55,
+      "name": "Seattle Kraken",
+      "city": "Seattle",
+      "teamName": "Kraken",
+      "color": "#001628",
+      "division": "Pacific",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "SJS",
+      "id": 28,
+      "name": "San Jose Sharks",
+      "city": "San Jose",
+      "teamName": "Sharks",
+      "color": "#006D75",
+      "division": "Pacific",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "STL",
+      "id": 19,
+      "name": "St. Louis Blues",
+      "city": "St. Louis",
+      "teamName": "Blues",
+      "color": "#002F87",
+      "division": "Central",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "TBL",
+      "id": 14,
+      "name": "Tampa Bay Lightning",
+      "city": "Tampa Bay",
+      "teamName": "Lightning",
+      "color": "#002868",
+      "division": "Atlantic",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "TOR",
+      "id": 10,
+      "name": "Toronto Maple Leafs",
+      "city": "Toronto",
+      "teamName": "Maple Leafs",
+      "color": "#00205B",
+      "division": "Atlantic",
+      "conference": "Eastern"
+    },
+    {
+      "abbrev": "UTA",
+      "id": 59,
+      "name": "Utah Mammoth",
+      "city": "Utah",
+      "teamName": "Mammoth",
+      "color": "#69B3E7",
+      "division": "Central",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "VAN",
+      "id": 23,
+      "name": "Vancouver Canucks",
+      "city": "Vancouver",
+      "teamName": "Canucks",
+      "color": "#00205B",
+      "division": "Pacific",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "VGK",
+      "id": 54,
+      "name": "Vegas Golden Knights",
+      "city": "Vegas",
+      "teamName": "Golden Knights",
+      "color": "#B4975A",
+      "division": "Pacific",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "WPG",
+      "id": 52,
+      "name": "Winnipeg Jets",
+      "city": "Winnipeg",
+      "teamName": "Jets",
+      "color": "#041E42",
+      "division": "Central",
+      "conference": "Western"
+    },
+    {
+      "abbrev": "WSH",
+      "id": 15,
+      "name": "Washington Capitals",
+      "city": "Washington",
+      "teamName": "Capitals",
+      "color": "#C8102E",
+      "division": "Metropolitan",
+      "conference": "Eastern"
+    }
+  ],
+  "logoUrlPattern": "https://assets.nhle.com/logos/nhl/svg/{ABBREV}_light.svg",
+  "mugshotUrlPattern": "https://assets.nhle.com/mugs/nhl/20252026/{ABBREV}/{PLAYER_ID}.png"
+}
