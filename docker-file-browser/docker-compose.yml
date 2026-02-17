@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  file-browser:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - CONTAINER_NAME=my-container  # Change this to target container name
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+
+  # Example container to browse files from
+  example-container:
+    image: alpine:latest
+    command: sh -c "mkdir -p /data && echo 'Hello World' > /data/test.txt && tail -f /dev/null"
+    volumes:
+      - example-data:/data
+    restart: unless-stopped
+
+volumes:
+  example-data:

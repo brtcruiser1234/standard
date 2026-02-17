@@ -1,0 +1,14 @@
+{
+  "name": "docker-file-browser",
+  "version": "1.0.0",
+  "description": "Web app to browse and download files from Docker containers",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "dockerode": "^4.0.2"
+  }
+}
