@@ -284,6 +284,164 @@ npm start (from correct directory)
 
 ---
 
+## 3D Printing Tools (Updated - 2026-02-18)
+
+### Overview
+Four integrated 3D modeling and printing workflows are now available:
+
+1. **build123d** - Parametric CAD in Python
+2. **ClaudeCAD** - Web app for sketch-based CAD
+3. **Blender MCP** - AI-powered 3D modeling with Blender (NEW)
+4. **MCP 3D Printer Server** - Send jobs to Bambu Lab printer
+
+### 1. build123d (Python CAD Framework)
+
+**Installation Status:** ✅ Complete
+**Location:** `~/.venv-3d/`
+**Skill:** `~/.claude/skills/build123d-cad-modeling/`
+
+**Usage:**
+```bash
+~/.venv-3d/bin/python /path/to/script.py
+```
+
+Write Python scripts that define 3D models, then export to STL/STEP/DXF:
+```python
+from build123d import *
+
+with BuildPart() as bp:
+    Box(width=10, height=10, depth=10)
+
+bp.part.save_step("/home/brandon/3d-prints/my_part.step")
+```
+
+**Output Directory:** `/home/brandon/3d-prints/`
+
+### 2. ClaudeCAD Web App
+
+**Installation Status:** ✅ Complete
+**Location:** `/home/brandon/claudecad/`
+**Port:** 4000 (local), `https://claudecad.taylorshome.cc` (public)
+**Systemd Service:** `claudecad.service`
+
+**Start/Stop:**
+```bash
+sudo systemctl start claudecad    # Start
+sudo systemctl stop claudecad     # Stop
+sudo systemctl status claudecad   # Check status
+sudo systemctl restart claudecad  # Restart
+```
+
+**Access:**
+- Local: `http://localhost:4000`
+- Public: `https://claudecad.taylorshome.cc`
+
+**Features:**
+- Sketch-based CAD interface
+- Vision-based model generation
+- Export to STL format
+- Real-time Claude integration
+
+### 3. Blender MCP (AI-Powered 3D Modeling)
+
+**Installation Status:** ✅ Ready to Install
+**Location:** Blender application + blender-mcp package
+**Skill:** `~/.claude/skills/blender-mcp-3d-modeling/`
+
+**Quick Setup:**
+```bash
+# Install Blender MCP
+pip install blender-mcp
+
+# Add to ~/.claude/settings.json
+{
+  "mcpServers": {
+    "blender": {
+      "command": "blender-mcp",
+      "args": ["--port", "9091"]
+    }
+  }
+}
+
+# Start Blender
+blender &
+```
+
+**Features:**
+- Generate 3D models from natural language descriptions
+- Interactive model refinement and modification
+- Full object manipulation (position, rotation, scale, color)
+- Material and texture application
+- Complex scene creation
+- Export to STL, OBJ, FBX, STEP, GLB/GLTF
+- No manual Blender interaction needed
+
+**Best For:**
+- Artistic and visual design
+- Game assets and 3D visualization
+- Product mockups and prototypes
+- Complex organic shapes
+- Scene composition with multiple objects
+
+**Comparison:**
+- **build123d**: Parametric engineering parts (precision)
+- **Blender MCP**: Artistic design and visualization (flexibility)
+- **ClaudeCAD**: Quick sketches and concept design (speed)
+
+**Usage:**
+Simply describe what you want: "Create a red metallic sphere with a shiny finish"
+
+Claude will generate the Blender commands via MCP automatically.
+
+**Resources:**
+- GitHub: https://github.com/ahujasid/blender-mcp
+- Website: https://blender-mcp.com/
+- PyPI: https://pypi.org/project/blender-mcp/
+
+### 4. MCP 3D Printer Server (Bambu Lab)
+
+**Installation Status:** ⏳ Pending
+
+**Setup Required:**
+1. Get printer IP address (see "Finding Printer IP" below)
+2. Get serial number (from printer sticker or Settings)
+3. Get access token (from Bambu Handy app → Profile → Access Code)
+
+**Finding Printer IP:**
+- Option A: Bambu Handy app → Device Settings
+- Option B: Router admin panel → Connected Devices (look for "Bambu-Lab")
+- Option C: `bambulab.local` in browser (if mDNS available)
+
+**Installation (when ready):**
+```bash
+npm install -g mcp-3d-printer-server
+```
+
+**Configuration (to be added to ~/.claude/settings.json):**
+```json
+{
+  "mcpServers": {
+    "3dprint": {
+      "command": "mcp-3d-printer-server",
+      "env": {
+        "PRINTER_TYPE": "bambu",
+        "PRINTER_HOST": "<YOUR_PRINTER_IP>",
+        "BAMBU_SERIAL": "<YOUR_SERIAL_NUMBER>",
+        "BAMBU_TOKEN": "<YOUR_ACCESS_TOKEN>"
+      }
+    }
+  }
+}
+```
+
+**Usage (after setup):**
+```bash
+# In Claude Code, use /mcp command to access 3D printer tools
+/mcp list          # Show available printer commands
+```
+
+---
+
 ## File Structure
 
 ```
@@ -325,12 +483,13 @@ npm start (from correct directory)
 
 ## Version Information
 
-**Current State:** 2026-02-13
+**Current State:** 2026-02-18
 - Both applications successfully migrated from Unraid to local machine
 - Running on localhost with ports 8888 and 3050
 - Exposed via Cloudflare Tunnel at taylorshome.cc domain
 - Complete documentation in APPS_DOCUMENTATION.md
 - Source code backed up in GitHub repository
+- **NEW:** Blender MCP skill added for AI-powered 3D modeling
 
 **Node.js Version:** 18.19.1
 **Cloudflared Version:** 2026.2.0
