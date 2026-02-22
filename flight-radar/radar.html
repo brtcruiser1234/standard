@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADS-B Radar</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%23000d00'/><circle cx='16' cy='16' r='14' fill='none' stroke='%2300ff41' stroke-width='0.8' opacity='0.6'/><circle cx='16' cy='16' r='9.5' fill='none' stroke='%2300ff41' stroke-width='0.6' opacity='0.4'/><circle cx='16' cy='16' r='5' fill='none' stroke='%2300ff41' stroke-width='0.5' opacity='0.4'/><line x1='16' y1='16' x2='16' y2='2' stroke='%2300ff41' stroke-width='1.2' opacity='0.3'/><line x1='16' y1='16' x2='2' y2='16' stroke='%2300ff41' stroke-width='0.5' opacity='0.2'/><line x1='16' y1='16' x2='26' y2='6' stroke='%2300ff41' stroke-width='1.5' opacity='0.95'/><circle cx='16' cy='16' r='1.2' fill='%2300ff41'/><circle cx='22' cy='9' r='1.5' fill='%2300ff41' opacity='0.9'/><circle cx='10' cy='20' r='1' fill='%2300ff41' opacity='0.5'/></svg>">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    color: #00ff41;
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px;
+    background: rgba(0,0,0,0.85);
+    border-bottom: 1px solid #003a10;
+    z-index: 10;
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+
+  #header .title {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px #00ff41;
+    letter-spacing: 3px;
+  }
+
+  #header .stats {
+    display: flex;
+    gap: 24px;
+  }
+
+  #header .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  #header .stat-label {
+    font-size: 9px;
+    color: #006620;
+    letter-spacing: 1px;
+  }
+
+  #header .stat-value {
+    font-size: 14px;
+    text-shadow: 0 0 6px #00ff41;
+  }
+
+  #radar-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #radar {
+    border-radius: 50%;
+    cursor: crosshair;
+    filter: drop-shadow(0 0 20px rgba(0, 255, 65, 0.15));
+  }
+
+  #tooltip {
+    position: fixed;
+    background: rgba(0, 10, 0, 0.92);
+    border: 1px solid #00ff41;
+    padding: 8px 12px;
+    font-size: 11px;
+    line-height: 1.7;
+    pointer-events: none;
+    display: none;
+    z-index: 20;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 10px rgba(0,255,65,0.3);
+    min-width: 160px;
+  }
+
+  #tooltip .tt-callsign {
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 0 6px #00ff41;
+    margin-bottom: 4px;
+  }
+
+  #tooltip .tt-label {
+    color: #006620;
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+
+  #footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 6px 20px;
+    background: rgba(0,0,0,0.85);
+    border-top: 1px solid #003a10;
+    font-size: 10px;
+    color: #006620;
+    letter-spacing: 1px;
+    z-index: 10;
+  }
+
+  #status-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #00ff41;
+    box-shadow: 0 0 6px #00ff41;
+    animation: pulse 1.5s infinite;
+    vertical-align: middle;
+    margin-right: 5px;
+  }
+
+  #status-dot.error {
+    background: #ff3300;
+    box-shadow: 0 0 6px #ff3300;
+    animation: none;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* CRT scanline overlay */
+  #scanlines {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 3px,
+      rgba(0, 0, 0, 0.18) 3px,
+      rgba(0, 0, 0, 0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* Tracked aircraft panel */
+  #tracked-panel {
+    position: fixed;
+    top: 50px;
+    right: 16px;
+    width: 200px;
+    background: rgba(0,10,0,0.92);
+    border: 1px solid #00ff41;
+    padding: 10px 14px;
+    font-size: 11px;
+    line-height: 1.8;
+    z-index: 20;
+    display: none;
+    box-shadow: 0 0 16px rgba(0,255,65,0.25);
+    letter-spacing: 0.5px;
+  }
+  #tracked-panel .tp-title {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+  }
+  #tracked-panel .tp-close {
+    float: right;
+    cursor: pointer;
+    color: #006620;
+    font-size: 14px;
+    line-height: 1;
+    margin-top: -2px;
+  }
+  #tracked-panel .tp-close:hover { color: #00ff41; }
+  #tracked-panel .tp-label { color: #006620; font-size: 9px; letter-spacing: 1px; }
+
+  #filter-btn {
+    cursor: pointer;
+    padding: 1px 6px;
+    border: 1px solid #003a10;
+    background: transparent;
+    color: #006620;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  #filter-btn.active { color: #00ff41; border-color: #00ff41; }
+
+  @keyframes emergencyPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="title">&#9632; ADS-B RADAR</div>
+  <div class="stats">
+    <div class="stat-item">
+      <span class="stat-label">AIRCRAFT</span>
+      <span class="stat-value" id="stat-count">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">RANGE</span>
+      <span class="stat-value" id="stat-range">--</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">UTC</span>
+      <span class="stat-value" id="stat-time">--:--:--</span>
+    </div>
+  </div>
+</div>
+
+<canvas id="radar"></canvas>
+<div id="scanlines"></div>
+<div id="tooltip"></div>
+<div id="tracked-panel">
+  <span class="tp-close" id="tp-close">✕</span>
+  <div class="tp-title" id="tp-callsign">---</div>
+  <div id="tp-airline" style="font-size:10px;margin-bottom:4px;"></div>
+  <div id="tp-body"></div>
+</div>
+
+<div id="footer">
+  <span><span id="status-dot"></span><span id="status-text">CONNECTING...</span></span>
+  <span>HOVER: INFO &nbsp;|&nbsp; CLICK: TRACK &nbsp;|&nbsp; SCROLL: ZOOM</span>
+  <span>
+    ALT:
+    <span style="color:rgb(160,255,30)">&#9632;</span> &lt;5k &nbsp;
+    <span style="color:rgb(0,255,65)">&#9632;</span> 5-18k &nbsp;
+    <span style="color:rgb(0,230,180)">&#9632;</span> 18-35k &nbsp;
+    <span style="color:rgb(180,255,255)">&#9632;</span> 35k+
+    &nbsp;|&nbsp;
+    <button id="filter-btn">GND FILTER: OFF</button>
+    &nbsp;
+    <button id="ping-btn" class="active" style="cursor:pointer;padding:1px 6px;border:1px solid #00ff41;background:transparent;color:#00ff41;font-family:'Courier New',monospace;font-size:10px;letter-spacing:1px;">PING: ON</button>
+  </span>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURATION - UPDATE THESE VALUES
+// ============================================================
+// Nearby airports (within ~200NM of Salem, UT)
+const AIRPORTS = [
+  { icao: 'KSLC', iata: 'SLC', name: 'Salt Lake City Intl',    lat: 40.7884, lon: -111.9778, major: true  },
+  { icao: 'KPVU', iata: 'PVU', name: 'Provo Municipal',        lat: 40.2192, lon: -111.7229, major: false },
+  { icao: 'KOGD', iata: 'OGD', name: 'Ogden-Hinckley',         lat: 41.1959, lon: -112.0122, major: false },
+  { icao: 'KCDC', iata: 'CDC', name: 'Cedar City Regional',    lat: 37.7010, lon: -113.0986, major: false },
+  { icao: 'KVEL', iata: 'VEL', name: 'Vernal Regional',        lat: 40.4409, lon: -109.5100, major: false },
+  { icao: 'KPUC', iata: 'PUC', name: 'Carbon County/Price',    lat: 39.6139, lon: -110.7506, major: false },
+  { icao: 'KCNY', iata: 'CNY', name: 'Canyonlands Field',      lat: 38.7553, lon: -109.7549, major: false },
+  { icao: 'KU42', iata: 'U42', name: 'Nephi Municipal',        lat: 39.7108, lon: -111.8783, major: false },
+  { icao: 'KU77', iata: 'U77', name: 'Spanish Fork Airport',   lat: 40.1530, lon: -111.6455, major: false },
+  { icao: 'KENV', iata: 'ENV', name: 'Wendover Airport',       lat: 40.7187, lon: -114.0308, major: false },
+  { icao: 'KPGA', iata: 'PGA', name: 'Page Municipal',         lat: 36.9261, lon: -111.4483, major: false },
+  { icao: 'KPSP', iata: 'SGU', name: 'St George Regional',     lat: 37.0363, lon: -113.5100, major: false },
+];
+
+// Airline ICAO prefix -> full name
+const AIRLINES = {
+  'AAL': 'American Airlines',   'ASA': 'Alaska Airlines',
+  'DAL': 'Delta Air Lines',     'UAL': 'United Airlines',
+  'SWA': 'Southwest Airlines',  'SKW': 'SkyWest Airlines',
+  'WJA': 'WestJet',             'QTR': 'Qatar Airways',
+  'BAW': 'British Airways',     'AFR': 'Air France',
+  'DLH': 'Lufthansa',           'UAE': 'Emirates',
+  'ETD': 'Etihad Airways',      'KLM': 'KLM',
+  'IBE': 'Iberia',              'VIR': 'Virgin Atlantic',
+  'ANA': 'All Nippon Airways',  'JAL': 'Japan Airlines',
+  'CCA': 'Air China',           'CSN': 'China Southern',
+  'CES': 'China Eastern',       'KAL': 'Korean Air',
+  'AAR': 'Asiana Airlines',     'THY': 'Turkish Airlines',
+  'SIA': 'Singapore Airlines',  'THA': 'Thai Airways',
+  'TAP': 'TAP Portugal',        'EIN': 'Aer Lingus',
+  'FDX': 'FedEx',               'UPS': 'UPS Airlines',
+  'GTI': 'Atlas Air',           'ABX': 'ABX Air',
+  'ATN': 'Air Transport Intl',  'KHM': 'Kalitta Air',
+  'FFT': 'Frontier Airlines',   'NKS': 'Spirit Airlines',
+  'JBU': 'JetBlue',             'HAL': 'Hawaiian Airlines',
+  'SXD': 'Sun Country',         'RPA': 'Republic Airlines',
+  'ENY': 'Envoy Air',           'GJS': 'GoJet Airlines',
+  'EDV': 'Endeavor Air',        'PDT': 'Piedmont Airlines',
+  'PSA': 'PSA Airlines',        'EJA': 'NetJets',
+  'CPZ': 'Compass Airlines',    'SVA': 'Saudia',
+  'MSR': 'EgyptAir',            'ELY': 'El Al',
+  'CAL': 'China Airlines',      'EVA': 'EVA Air',
+  'MAS': 'Malaysia Airlines',
+};
+
+// Altitude -> RGB color (stays in green family, shifts toward white at high altitude)
+function altRgb(alt) {
+  if (alt == null || alt < 0)   return [0,   255,  65];  // default green
+  if (alt < 5000)               return [160, 255,  30];  // low: yellow-green (GA/approach)
+  if (alt < 18000)              return [0,   255,  65];  // mid-low: classic green
+  if (alt < 35000)              return [0,   230, 180];  // mid: teal
+  return                               [180, 255, 255];  // high cruise: near white
+}
+
+// Emergency squawk codes
+const SQUAWK_EMERGENCY = {
+  '7700': { label: 'EMERGENCY',     color: [255, 40,  40]  },
+  '7600': { label: 'RADIO FAILURE', color: [255, 160, 0]   },
+  '7500': { label: 'HIJACK',        color: [255, 0,   200] },
+};
+
+const CONFIG = {
+  // Salem, Utah
+  lat: 40.0577,
+  lon: -111.6724,
+
+  // Proxy on this server
+  dataUrl: '/data/aircraft.json',
+
+  // Display range in nautical miles (radius shown on radar)
+  rangeNm: 52,
+
+  // How often to fetch new data (milliseconds)
+  fetchInterval: 2000,
+
+  // Sweep speed: seconds for one full 360° rotation
+  sweepPeriod: 6,
+
+  // How many degrees wide the sweep glow is
+  sweepWidth: 35,
+
+  // Aircraft blip fade time (should match sweepPeriod for realistic fade)
+  blipFadeSeconds: 7,
+
+  // Show blips that are beyond range (as dim edge markers)
+  showBeyondRange: false,
+
+  // Minimum altitude filter (feet) - set 0 for all
+  minAlt: 0,
+};
+// ============================================================
+
+const canvas = document.getElementById('radar');
+const ctx = canvas.getContext('2d');
+const tooltip = document.getElementById('tooltip');
+
+const EARTH_NM = 3440.065; // Earth radius in nautical miles
+const DEG = Math.PI / 180;
+
+let aircraft = [];
+let blipState    = {}; // hex -> { time, bloomTime }
+let trailHistory = {}; // hex -> [{x, y}, ...] in NM offsets, newest last
+const TRAIL_MAX  = 30;
+let sweepAngle   = -Math.PI / 2;
+let lastSweepAngle = -Math.PI / 2;
+let hoverAircraft  = null;
+let trackedHex     = null;
+let filterGround   = false;
+let pingEnabled    = true;
+let mouseX = 0, mouseY = 0;
+let lastFetch = 0;
+
+// Audio
+let audioCtx = null;
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+function playPing() {
+  if (!pingEnabled) return;
+  try {
+    initAudio();
+    const osc  = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.4);
+    gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.5);
+  } catch(e) {}
+}
+
+// Canvas sizing
+function resize() {
+  const headerH = document.getElementById('header').offsetHeight;
+  const footerH = document.getElementById('footer').offsetHeight;
+  const available = Math.min(
+    window.innerWidth,
+    window.innerHeight - headerH - footerH
+  ) - 20;
+  const size = Math.floor(available);
+  canvas.width = size;
+  canvas.height = size;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Scroll to zoom
+window.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? 1.1 : 0.9;
+  CONFIG.rangeNm = Math.max(20, Math.min(400, CONFIG.rangeNm * delta));
+  document.getElementById('stat-range').textContent = Math.round(CONFIG.rangeNm) + 'NM';
+}, { passive: false });
+
+// Coordinate conversion: lat/lon -> NM offsets from center
+function latLonToNm(lat, lon) {
+  const dLat = (lat - CONFIG.lat) * DEG;
+  const dLon = (lon - CONFIG.lon) * DEG;
+  const x = EARTH_NM * dLon * Math.cos(CONFIG.lat * DEG); // East
+  const y = -EARTH_NM * dLat;                              // South (screen down)
+  return { x, y };
+}
+
+// NM offsets -> canvas pixels
+function nmToCanvas(x, y) {
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const scale = (canvas.width / 2) / CONFIG.rangeNm;
+  return { px: cx + x * scale, py: cy + y * scale };
+}
+
+// Distance from center in NM
+function distNm(lat, lon) {
+  const { x, y } = latLonToNm(lat, lon);
+  return Math.sqrt(x * x + y * y);
+}
+
+// Bearing from center to aircraft in radians (0 = up/north, clockwise)
+function bearingRad(lat, lon) {
+  const { x, y } = latLonToNm(lat, lon);
+  return Math.atan2(x, -y); // clockwise from north
+}
+
+// Fetch aircraft data
+async function fetchAircraft() {
+  try {
+    const res = await fetch(CONFIG.dataUrl, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    aircraft = (data.aircraft || []).filter(a => {
+      if (a.lat == null || a.lon == null) return false;
+      if ((a.alt_baro || 0) < CONFIG.minAlt) return false;
+      if (filterGround && (a.alt_baro == null || a.alt_baro <= 50)) return false;
+      return true;
+    });
+
+    // Record trail positions
+    const seen = new Set();
+    aircraft.forEach(a => {
+      seen.add(a.hex);
+      const pt = latLonToNm(a.lat, a.lon);
+      if (!trailHistory[a.hex]) trailHistory[a.hex] = [];
+      const trail = trailHistory[a.hex];
+      // Only add if aircraft has moved meaningfully (> 0.05 NM)
+      const last = trail[trail.length - 1];
+      if (!last || Math.hypot(pt.x - last.x, pt.y - last.y) > 0.05) {
+        trail.push(pt);
+        if (trail.length > TRAIL_MAX) trail.shift();
+      }
+    });
+    // Prune trails for aircraft no longer visible
+    Object.keys(trailHistory).forEach(hex => {
+      if (!seen.has(hex)) delete trailHistory[hex];
+    });
+
+    fetchOk = true;
+    document.getElementById('status-dot').className = '';
+    document.getElementById('status-text').textContent = 'LIVE';
+    document.getElementById('stat-count').textContent = aircraft.length;
+  } catch (e) {
+    fetchOk = false;
+    document.getElementById('status-dot').className = 'error';
+    document.getElementById('status-text').textContent = 'NO SIGNAL: ' + e.message;
+  }
+}
+
+// Draw a single range ring with label
+function drawRing(cx, cy, radiusPx, label) {
+  ctx.beginPath();
+  ctx.arc(cx, cy, radiusPx, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(0, 80, 20, 0.5)';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+
+  if (label) {
+    ctx.fillStyle = 'rgba(0, 100, 30, 0.8)';
+    ctx.font = `${Math.max(9, canvas.width * 0.013)}px 'Courier New'`;
+    ctx.textAlign = 'center';
+    ctx.fillText(label, cx, cy - radiusPx + 12);
+  }
+}
+
+// Draw the static radar background
+function drawBackground(cx, cy, radius) {
+  // Outer boundary fill
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fillStyle = '#000d00';
+  ctx.fill();
+
+  // Subtle radial gradient
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+  grad.addColorStop(0, 'rgba(0,40,5,0.4)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Range rings
+  const ringIntervals = CONFIG.rangeNm <= 60  ? [10, 20, 30, 40, 50, 60] :
+                        CONFIG.rangeNm <= 120 ? [25, 50, 75, 100] :
+                        CONFIG.rangeNm <= 200 ? [50, 100, 150, 200] :
+                                               [50, 100, 150, 200, 250, 300, 350, 400];
+
+  const scale = radius / CONFIG.rangeNm;
+  ringIntervals.forEach(nm => {
+    if (nm <= CONFIG.rangeNm) {
+      drawRing(cx, cy, nm * scale, nm + 'NM');
+    }
+  });
+
+  // Cross hairs
+  ctx.strokeStyle = 'rgba(0, 80, 20, 0.35)';
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([4, 8]);
+  ctx.beginPath(); ctx.moveTo(cx, cy - radius); ctx.lineTo(cx, cy + radius); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx - radius, cy); ctx.lineTo(cx + radius, cy); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Cardinal labels
+  const labelSize = Math.max(11, canvas.width * 0.016);
+  ctx.font = `bold ${labelSize}px 'Courier New'`;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(0, 180, 50, 0.7)';
+  const pad = labelSize + 4;
+  ctx.fillText('N', cx, cy - radius + pad);
+  ctx.fillText('S', cx, cy + radius - 4);
+  ctx.fillText('E', cx + radius - 4, cy + labelSize / 3);
+  ctx.fillText('W', cx - radius + 4, cy + labelSize / 3);
+
+  // Outer border ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(0, 150, 40, 0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+  ctx.fillStyle = '#00ff41';
+  ctx.fill();
+}
+
+// Draw airports on the radar
+function drawAirports(cx, cy) {
+  const fontSize = Math.max(9, canvas.width * 0.013);
+
+  AIRPORTS.forEach(ap => {
+    const { x, y } = latLonToNm(ap.lat, ap.lon);
+    const dist = Math.sqrt(x * x + y * y);
+    if (dist > CONFIG.rangeNm * 1.02) return;
+
+    const { px, py } = nmToCanvas(x, y);
+    const isMajor = ap.major;
+
+    // Fixed minimum screen size so nearby airports are always legible
+    const r    = isMajor ? 9 : 7;
+    const arm  = r + (isMajor ? 5 : 4);
+    const color      = isMajor ? 'rgba(0, 220, 90, 0.85)' : 'rgba(0, 180, 70, 0.80)';
+    const glowColor  = isMajor ? 'rgba(0, 255, 80, 0.3)'  : 'rgba(0, 200, 70, 0.2)';
+
+    ctx.save();
+
+    // Glow
+    ctx.shadowColor = color;
+    ctx.shadowBlur  = isMajor ? 8 : 5;
+
+    // Outer circle
+    ctx.beginPath();
+    ctx.arc(px, py, r, 0, Math.PI * 2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = isMajor ? 1.8 : 1.3;
+    ctx.stroke();
+
+    // Cross arms
+    ctx.lineWidth = isMajor ? 1.4 : 1.1;
+    ctx.beginPath(); ctx.moveTo(px - arm, py); ctx.lineTo(px + arm, py); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px, py - arm); ctx.lineTo(px, py + arm); ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    // Label
+    ctx.font      = `${isMajor ? 'bold ' : ''}${fontSize}px 'Courier New'`;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'left';
+    ctx.fillText(ap.iata, px + arm + 4, py + fontSize * 0.38);
+
+    ctx.restore();
+  });
+}
+
+// Draw the rotating sweep
+function drawSweep(cx, cy, radius, angle) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, angle - CONFIG.sweepWidth * DEG, angle, false);
+  ctx.lineTo(cx, cy);
+  ctx.closePath();
+
+  const grad = ctx.createConicalGradient
+    ? null  // Not widely supported
+    : null;
+
+  // Use a radial gradient approximation instead
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+  g.addColorStop(0, 'rgba(0, 255, 65, 0.05)');
+  g.addColorStop(0.6, 'rgba(0, 255, 65, 0.12)');
+  g.addColorStop(1, 'rgba(0, 255, 65, 0.06)');
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.restore();
+
+  // Leading edge line (bright)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle));
+  ctx.strokeStyle = 'rgba(0, 255, 65, 0.9)';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = '#00ff41';
+  ctx.shadowBlur = 8;
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Draw historical trail for an aircraft
+function drawTrail(trail, blipBrightness, rgb) {
+  if (trail.length < 2) return;
+  const [r, g, b] = rgb;
+  ctx.save();
+  for (let i = 1; i < trail.length; i++) {
+    const { px: x1, py: y1 } = nmToCanvas(trail[i - 1].x, trail[i - 1].y);
+    const { px: x2, py: y2 } = nmToCanvas(trail[i].x, trail[i].y);
+    const ageFraction = i / trail.length;
+    const alpha = ageFraction * ageFraction * blipBrightness * 0.6;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+    ctx.lineWidth = Math.max(0.5, ageFraction * 1.5);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Draw heading vector (line extending forward in direction of travel)
+function drawHeadingVector(px, py, track, speed, brightness, rgb) {
+  if (track == null || speed == null || speed < 10) return;
+  const [r, g, b] = rgb;
+  // 3 minutes of travel at current speed
+  const vectorNm = speed * (3 / 60);
+  const scale = (canvas.width / 2) / CONFIG.rangeNm;
+  const lengthPx = Math.max(12, vectorNm * scale);
+  const angle = (track - 90) * DEG; // canvas angle (0=right, north=up)
+  const ex = px + Math.cos(angle) * lengthPx;
+  const ey = py + Math.sin(angle) * lengthPx;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(px, py);
+  ctx.lineTo(ex, ey);
+  ctx.strokeStyle = `rgba(${r},${g},${b},${brightness * 0.75})`;
+  ctx.lineWidth = 1.2;
+  ctx.setLineDash([3, 3]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+// Draw a single aircraft blip
+function drawBlip(px, py, brightness, isHovered, rgb, emergency, bloomTime) {
+  const size = canvas.width * 0.007;
+  const alpha = Math.max(0.05, brightness);
+  const [r, g, b] = rgb;
+
+  // Phosphor bloom — bright white flash when sweep first hits
+  const bloomAge = bloomTime ? (Date.now() - bloomTime) / 1000 : 99;
+  const bloomAlpha = bloomAge < 0.15 ? Math.max(0, 1 - bloomAge / 0.15) : 0;
+
+  ctx.save();
+
+  if (emergency) {
+    // Pulsing emergency ring
+    const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 180);
+    const [er, eg, eb] = emergency.color;
+    ctx.beginPath();
+    ctx.arc(px, py, size * 3.5, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(${er},${eg},${eb},${pulse * 0.9})`;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = `rgb(${er},${eg},${eb})`;
+    ctx.shadowBlur = 16 * pulse;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  if (isHovered) {
+    ctx.beginPath();
+    ctx.arc(px, py, size * 2.5, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(${r},${g},${b},0.5)`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Outer glow
+  ctx.shadowColor = `rgb(${r},${g},${b})`;
+  ctx.shadowBlur = 10 * alpha;
+
+  // Blip dot
+  ctx.beginPath();
+  ctx.arc(px, py, size, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+  ctx.fill();
+
+  // Bright center
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.arc(px, py, size * 0.4, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(220,255,230,${Math.min(1, alpha * 1.5)})`;
+  ctx.fill();
+
+  // Phosphor bloom flash
+  if (bloomAlpha > 0) {
+    ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur = 20 * bloomAlpha;
+    ctx.beginPath();
+    ctx.arc(px, py, size * 2.5 * bloomAlpha, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${bloomAlpha * 0.9})`;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  ctx.restore();
+}
+
+// Main render loop
+let lastTime = 0;
+function render(ts) {
+  const dt = Math.min((ts - lastTime) / 1000, 0.1);
+  lastTime = ts;
+
+  // Advance sweep
+  lastSweepAngle = sweepAngle;
+  sweepAngle += (2 * Math.PI / CONFIG.sweepPeriod) * dt;
+  // Ping when sweep crosses north (-π/2)
+  const NORTH = -Math.PI / 2;
+  if (lastSweepAngle < NORTH && sweepAngle >= NORTH) playPing();
+  if (sweepAngle > Math.PI) sweepAngle -= 2 * Math.PI;
+
+  // Fetch new data periodically
+  if (ts - lastFetch > CONFIG.fetchInterval) {
+    lastFetch = ts;
+    fetchAircraft();
+  }
+
+  // Update time display
+  const now = new Date();
+  document.getElementById('stat-time').textContent =
+    now.getUTCHours().toString().padStart(2, '0') + ':' +
+    now.getUTCMinutes().toString().padStart(2, '0') + ':' +
+    now.getUTCSeconds().toString().padStart(2, '0');
+  document.getElementById('stat-range').textContent = Math.round(CONFIG.rangeNm) + 'NM';
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const radius = canvas.width / 2;
+
+  // Clear
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Clip to circle
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius - 1, 0, Math.PI * 2);
+  ctx.clip();
+
+  drawBackground(cx, cy, radius - 1);
+  drawAirports(cx, cy);
+
+  // Check which aircraft are being swept over
+  aircraft.forEach(a => {
+    const bearing = bearingRad(a.lat, a.lon);
+    const angDiff = ((sweepAngle - bearing + 3 * Math.PI) % (2 * Math.PI)) - Math.PI;
+
+    if (angDiff >= 0 && angDiff < CONFIG.sweepWidth * DEG) {
+      const now = Date.now();
+      const prev = blipState[a.hex];
+      // Only bloom on the leading edge (first hit)
+      const bloom = (!prev || now - prev.time > 500);
+      blipState[a.hex] = { time: now, bloomTime: bloom ? now : (prev?.bloomTime || 0) };
+    }
+  });
+
+  // Draw sweep
+  drawSweep(cx, cy, radius - 1, sweepAngle);
+
+  // Draw aircraft blips
+  hoverAircraft = null;
+  aircraft.forEach(a => {
+    const nm = distNm(a.lat, a.lon);
+    if (!CONFIG.showBeyondRange && nm > CONFIG.rangeNm) return;
+
+    const { x, y } = latLonToNm(a.lat, a.lon);
+    const { px, py } = nmToCanvas(x, y);
+
+    const state = blipState[a.hex];
+    let brightness = 0.08;
+    if (state) {
+      const age = (Date.now() - state.time) / 1000;
+      brightness = Math.max(0.08, 1 - (age / CONFIG.blipFadeSeconds));
+    }
+
+    // Altitude color
+    const rgb = altRgb(a.alt_baro ?? a.alt_geom);
+
+    // Emergency squawk
+    const emergency = SQUAWK_EMERGENCY[a.squawk] || null;
+
+    // Check hover
+    const dx = mouseX - px, dy = mouseY - py;
+    const hitRadius = Math.max(14, canvas.width * 0.025);
+    const isHovered = Math.sqrt(dx * dx + dy * dy) < hitRadius;
+    if (isHovered) hoverAircraft = { a, px, py, rgb, emergency };
+
+    // Trail
+    if (trailHistory[a.hex]) drawTrail(trailHistory[a.hex], brightness, rgb);
+
+    // Heading vector
+    drawHeadingVector(px, py, a.track, a.gs, brightness, rgb);
+
+    // Blip
+    const bloomTime = blipState[a.hex]?.bloomTime || 0;
+    const isTracked = a.hex === trackedHex;
+    drawBlip(px, py, brightness, isHovered || isTracked, rgb, emergency, bloomTime);
+
+    // Tracked ring
+    if (isTracked) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(px, py, canvas.width * 0.02, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(0,255,65,0.5)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    // Callsign label for bright blips
+    if (brightness > 0.5 && a.flight) {
+      const [r, g, b] = rgb;
+      ctx.save();
+      ctx.font = `${Math.max(9, canvas.width * 0.012)}px 'Courier New'`;
+      ctx.fillStyle = `rgba(${r},${g},${b},${brightness * 0.8})`;
+      ctx.shadowColor = `rgb(${r},${g},${b})`;
+      ctx.shadowBlur = 3;
+      ctx.textAlign = 'left';
+      ctx.fillText(a.flight.trim(), px + 8, py - 4);
+      ctx.restore();
+    }
+
+    // Emergency label — always visible regardless of sweep
+    if (emergency) {
+      const [er, eg, eb] = emergency.color;
+      const pulse = 0.6 + 0.4 * Math.sin(Date.now() / 200);
+      ctx.save();
+      ctx.font = `bold ${Math.max(9, canvas.width * 0.012)}px 'Courier New'`;
+      ctx.fillStyle = `rgba(${er},${eg},${eb},${pulse})`;
+      ctx.shadowColor = `rgb(${er},${eg},${eb})`;
+      ctx.shadowBlur = 6;
+      ctx.textAlign = 'left';
+      ctx.fillText(`⚠ ${emergency.label}`, px + 10, py + 14);
+      ctx.restore();
+    }
+  });
+
+  ctx.restore(); // end clip
+
+  // Update tracked panel
+  const trackedAircraft = trackedHex ? aircraft.find(a => a.hex === trackedHex) : null;
+  const panel = document.getElementById('tracked-panel');
+  if (trackedAircraft) {
+    const ta = trackedAircraft;
+    const tCallsign = ta.flight ? ta.flight.trim() : ta.hex.toUpperCase();
+    const tPrefix = ta.flight ? ta.flight.trim().replace(/[0-9].*$/, '') : null;
+    const tAirline = tPrefix && AIRLINES[tPrefix] ? AIRLINES[tPrefix] : '';
+    const tAlt  = ta.alt_baro != null ? ta.alt_baro.toLocaleString() + ' ft' : '---';
+    const tSpd  = ta.gs != null ? Math.round(ta.gs) + ' kt' : '---';
+    const tHdg  = ta.track != null ? Math.round(ta.track) + '°' : '---';
+    const tNm   = distNm(ta.lat, ta.lon).toFixed(1);
+    const tBrg  = ((bearingRad(ta.lat, ta.lon) / DEG + 360) % 360).toFixed(0);
+    const tTyp  = ta.t || ta.r || '---';
+    const [tr, tg, tb] = altRgb(ta.alt_baro ?? ta.alt_geom);
+    document.getElementById('tp-callsign').textContent = tCallsign;
+    document.getElementById('tp-callsign').style.color = `rgb(${tr},${tg},${tb})`;
+    document.getElementById('tp-airline').textContent = tAirline;
+    document.getElementById('tp-body').innerHTML = `
+      <div><span class="tp-label">TYPE&nbsp;&nbsp;&nbsp;</span>${tTyp}</div>
+      <div><span class="tp-label">ICAO&nbsp;&nbsp;&nbsp;</span>${ta.hex.toUpperCase()}</div>
+      <div><span class="tp-label">ALT&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:rgb(${tr},${tg},${tb})">${tAlt}</span></div>
+      <div><span class="tp-label">SPEED&nbsp;&nbsp;</span>${tSpd}</div>
+      <div><span class="tp-label">HDG&nbsp;&nbsp;&nbsp;&nbsp;</span>${tHdg}</div>
+      <div><span class="tp-label">DIST&nbsp;&nbsp;&nbsp;</span>${tNm} NM / ${tBrg}°</div>
+      <div><span class="tp-label">SQUAWK&nbsp;</span>${ta.squawk || '---'}</div>
+    `;
+    panel.style.display = 'block';
+  } else if (trackedHex) {
+    // Aircraft left range
+    trackedHex = null;
+    panel.style.display = 'none';
+  }
+
+  // Tooltip
+  if (hoverAircraft) {
+    const { a, px, py, rgb, emergency } = hoverAircraft;
+    const nm = distNm(a.lat, a.lon).toFixed(1);
+    const bearing = ((bearingRad(a.lat, a.lon) / DEG + 360) % 360).toFixed(0);
+    const alt = a.alt_baro != null ? a.alt_baro.toLocaleString() + ' ft' : (a.alt_geom != null ? a.alt_geom.toLocaleString() + ' ft (geo)' : '---');
+    const speed = a.gs != null ? Math.round(a.gs) + ' kt' : '---';
+    const squawk = a.squawk || '---';
+    const acType = a.t || '';
+
+    // Airline lookup from callsign prefix
+    const callsign = a.flight ? a.flight.trim() : null;
+    const prefix = callsign ? callsign.replace(/[0-9].*$/, '') : null;
+    const airline = prefix && AIRLINES[prefix] ? AIRLINES[prefix] : null;
+
+    const [r, g, b] = rgb;
+    const altColor = `rgb(${r},${g},${b})`;
+    const emergencyBar = emergency
+      ? `<div style="background:rgba(${emergency.color[0]},${emergency.color[1]},${emergency.color[2]},0.2);border:1px solid rgba(${emergency.color[0]},${emergency.color[1]},${emergency.color[2]},0.8);color:rgb(${emergency.color[0]},${emergency.color[1]},${emergency.color[2]});padding:2px 6px;margin-bottom:5px;font-weight:bold;letter-spacing:2px;">⚠ ${emergency.label}</div>`
+      : '';
+
+    tooltip.innerHTML = `
+      ${emergencyBar}
+      <div class="tt-callsign" style="color:${altColor};text-shadow:0 0 6px ${altColor};">${callsign || a.hex.toUpperCase()}</div>
+      ${airline ? `<div style="color:#00cc44;font-size:10px;margin-bottom:3px;">${airline}</div>` : ''}
+      ${acType ? `<div style="color:#006620;font-size:9px;margin-bottom:3px;letter-spacing:1px;">${acType}</div>` : ''}
+      <div><span class="tt-label">ICAO&nbsp;&nbsp;&nbsp;</span>${a.hex.toUpperCase()}</div>
+      <div><span class="tt-label">ALT&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:${altColor}">${alt}</span></div>
+      <div><span class="tt-label">SPEED&nbsp;&nbsp;</span>${speed}</div>
+      <div><span class="tt-label">DIST&nbsp;&nbsp;&nbsp;</span>${nm} NM / ${bearing}°</div>
+      <div><span class="tt-label">SQUAWK&nbsp;</span>${squawk}</div>
+      ${a.track != null ? `<div><span class="tt-label">HDG&nbsp;&nbsp;&nbsp;&nbsp;</span>${Math.round(a.track)}°</div>` : ''}
+      <div style="color:#004410;font-size:9px;margin-top:4px;">CLICK TO TRACK</div>
+    `;
+    tooltip.style.display = 'block';
+
+    // Position tooltip, keep in viewport
+    const tw = 200, th = 140;
+    let tx = px + canvas.getBoundingClientRect().left + 18;
+    let ty = py + canvas.getBoundingClientRect().top - 70;
+    if (tx + tw > window.innerWidth) tx -= tw + 36;
+    if (ty < 0) ty = 10;
+    if (ty + th > window.innerHeight) ty = window.innerHeight - th - 10;
+    tooltip.style.left = tx + 'px';
+    tooltip.style.top = ty + 'px';
+  } else {
+    tooltip.style.display = 'none';
+  }
+
+  requestAnimationFrame(render);
+}
+
+// Mouse tracking
+canvas.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX - canvas.getBoundingClientRect().left;
+  mouseY = e.clientY - canvas.getBoundingClientRect().top;
+});
+canvas.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
+
+// Click to track
+canvas.addEventListener('click', (e) => {
+  initAudio(); // unblock audio context on first interaction
+  const cx = canvas.getBoundingClientRect().left;
+  const cy = canvas.getBoundingClientRect().top;
+  const mx = e.clientX - cx, my = e.clientY - cy;
+  const hitRadius = Math.max(14, canvas.width * 0.025);
+  let closest = null, closestDist = Infinity;
+  aircraft.forEach(a => {
+    const nm = distNm(a.lat, a.lon);
+    if (nm > CONFIG.rangeNm) return;
+    const { x, y } = latLonToNm(a.lat, a.lon);
+    const { px, py } = nmToCanvas(x, y);
+    const d = Math.hypot(mx - px, my - py);
+    if (d < hitRadius && d < closestDist) { closest = a; closestDist = d; }
+  });
+  if (closest) {
+    trackedHex = (trackedHex === closest.hex) ? null : closest.hex;
+    document.getElementById('tracked-panel').style.display = trackedHex ? 'block' : 'none';
+  }
+});
+
+// Close tracked panel
+document.getElementById('tp-close').addEventListener('click', () => {
+  trackedHex = null;
+  document.getElementById('tracked-panel').style.display = 'none';
+});
+
+// Ground filter toggle
+const filterBtn = document.getElementById('filter-btn');
+filterBtn.addEventListener('click', () => {
+  filterGround = !filterGround;
+  filterBtn.textContent = `GND FILTER: ${filterGround ? 'ON' : 'OFF'}`;
+  filterBtn.classList.toggle('active', filterGround);
+});
+
+// Ping toggle
+const pingBtn = document.getElementById('ping-btn');
+pingBtn.addEventListener('click', () => {
+  pingEnabled = !pingEnabled;
+  pingBtn.textContent = `PING: ${pingEnabled ? 'ON' : 'OFF'}`;
+  pingBtn.style.color = pingEnabled ? '#00ff41' : '#006620';
+  pingBtn.style.borderColor = pingEnabled ? '#00ff41' : '#003a10';
+});
+
+// Initial fetch then start render
+fetchAircraft().then(() => {
+  requestAnimationFrame(render);
+});
+</script>
+</body>
+</html>
