@@ -22,18 +22,18 @@
 
   #header {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 20px;
-    background: rgba(0,0,0,0.85);
+    padding: 6px 16px;
+    background: rgba(0,0,0,0.88);
     border-bottom: 1px solid #003a10;
     z-index: 10;
     font-size: 13px;
     letter-spacing: 1px;
+    flex-wrap: wrap;
+    gap: 4px;
   }
 
   #header .title {
@@ -42,11 +42,12 @@
     text-transform: uppercase;
     text-shadow: 0 0 8px #00ff41;
     letter-spacing: 3px;
+    flex-shrink: 0;
   }
 
   #header .stats {
     display: flex;
-    gap: 24px;
+    gap: 20px;
   }
 
   #header .stat-item {
@@ -67,11 +68,19 @@
     text-shadow: 0 0 6px #00ff41;
   }
 
-  #radar-container {
-    position: relative;
+  /* Session best stats — right side of header */
+  #session-stats {
     display: flex;
+    gap: 18px;
+    font-size: 9px;
+    color: #005518;
+    letter-spacing: 1px;
     align-items: center;
-    justify-content: center;
+    flex-shrink: 0;
+  }
+  #session-stats .ss-val {
+    color: #00bb44;
+    font-size: 10px;
   }
 
   #radar {
@@ -82,7 +91,7 @@
 
   #tooltip {
     position: fixed;
-    background: rgba(0, 10, 0, 0.92);
+    background: rgba(0, 10, 0, 0.93);
     border: 1px solid #00ff41;
     padding: 8px 12px;
     font-size: 11px;
@@ -92,7 +101,7 @@
     z-index: 20;
     letter-spacing: 0.5px;
     box-shadow: 0 0 10px rgba(0,255,65,0.3);
-    min-width: 160px;
+    min-width: 165px;
   }
 
   #tooltip .tt-callsign {
@@ -110,25 +119,24 @@
 
   #footer {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 0; left: 0; right: 0;
     display: flex;
     justify-content: center;
-    gap: 30px;
-    padding: 6px 20px;
-    background: rgba(0,0,0,0.85);
+    align-items: center;
+    gap: 18px;
+    padding: 5px 16px;
+    background: rgba(0,0,0,0.88);
     border-top: 1px solid #003a10;
     font-size: 10px;
     color: #006620;
     letter-spacing: 1px;
     z-index: 10;
+    flex-wrap: wrap;
   }
 
   #status-dot {
     display: inline-block;
-    width: 6px;
-    height: 6px;
+    width: 6px; height: 6px;
     border-radius: 50%;
     background: #00ff41;
     box-shadow: 0 0 6px #00ff41;
@@ -136,28 +144,22 @@
     vertical-align: middle;
     margin-right: 5px;
   }
-
   #status-dot.error {
     background: #ff3300;
     box-shadow: 0 0 6px #ff3300;
     animation: none;
   }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* CRT scanline overlay */
+  /* CRT scanlines */
   #scanlines {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: repeating-linear-gradient(
       to bottom,
-      transparent 0px,
-      transparent 3px,
-      rgba(0, 0, 0, 0.18) 3px,
-      rgba(0, 0, 0, 0.18) 4px
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,0.18) 3px, rgba(0,0,0,0.18) 4px
     );
     pointer-events: none;
     z-index: 5;
@@ -166,10 +168,9 @@
   /* Tracked aircraft panel */
   #tracked-panel {
     position: fixed;
-    top: 50px;
-    right: 16px;
-    width: 200px;
-    background: rgba(0,10,0,0.92);
+    top: 50px; right: 16px;
+    width: 215px;
+    background: rgba(0,10,0,0.93);
     border: 1px solid #00ff41;
     padding: 10px 14px;
     font-size: 11px;
@@ -179,24 +180,15 @@
     box-shadow: 0 0 16px rgba(0,255,65,0.25);
     letter-spacing: 0.5px;
   }
-  #tracked-panel .tp-title {
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 6px;
-    letter-spacing: 2px;
-  }
-  #tracked-panel .tp-close {
-    float: right;
-    cursor: pointer;
-    color: #006620;
-    font-size: 14px;
-    line-height: 1;
-    margin-top: -2px;
-  }
+  #tracked-panel .tp-title { font-size: 13px; font-weight: bold; margin-bottom: 6px; letter-spacing: 2px; }
+  #tracked-panel .tp-close { float: right; cursor: pointer; color: #006620; font-size: 14px; line-height: 1; margin-top: -2px; }
   #tracked-panel .tp-close:hover { color: #00ff41; }
   #tracked-panel .tp-label { color: #006620; font-size: 9px; letter-spacing: 1px; }
+  #tracked-panel .tp-fa-link { display: block; margin-top: 7px; color: #00bb44; font-size: 9px; letter-spacing: 1px; text-decoration: none; }
+  #tracked-panel .tp-fa-link:hover { color: #00ff41; text-decoration: underline; }
 
-  #filter-btn {
+  /* Shared button style */
+  .ctrl-btn {
     cursor: pointer;
     padding: 1px 6px;
     border: 1px solid #003a10;
@@ -205,20 +197,33 @@
     font-family: 'Courier New', monospace;
     font-size: 10px;
     letter-spacing: 1px;
-    transition: color 0.2s, border-color 0.2s;
+    transition: color 0.15s, border-color 0.15s;
   }
-  #filter-btn.active { color: #00ff41; border-color: #00ff41; }
+  .ctrl-btn.active  { color: #00ff41; border-color: #00ff41; }
+  .ctrl-btn:hover   { color: #00cc44; border-color: #00cc44; }
 
-  @keyframes emergencyPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
+  /* Zoom preset buttons */
+  .zoom-btn {
+    cursor: pointer;
+    padding: 1px 5px;
+    border: 1px solid #003a10;
+    background: transparent;
+    color: #006620;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    transition: color 0.15s, border-color 0.15s;
   }
+  .zoom-btn:hover, .zoom-btn.zoom-active { color: #00ff41; border-color: #00ff41; }
+
+  @keyframes emergencyPulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
 </style>
 </head>
 <body>
 
 <div id="header">
   <div class="title">&#9632; ADS-B RADAR</div>
+
   <div class="stats">
     <div class="stat-item">
       <span class="stat-label">AIRCRAFT</span>
@@ -232,12 +237,22 @@
       <span class="stat-label">UTC</span>
       <span class="stat-value" id="stat-time">--:--:--</span>
     </div>
+    <div class="stat-item">
+      <span class="stat-label">LOCAL</span>
+      <span class="stat-value" id="stat-local">--:--:--</span>
+    </div>
+  </div>
+
+  <div id="session-stats">
+    <div>MAX ALT: <span class="ss-val" id="stat-max-alt">---</span></div>
+    <div>FASTEST: <span class="ss-val" id="stat-fastest">---</span></div>
   </div>
 </div>
 
 <canvas id="radar"></canvas>
 <div id="scanlines"></div>
 <div id="tooltip"></div>
+
 <div id="tracked-panel">
   <span class="tp-close" id="tp-close">✕</span>
   <div class="tp-title" id="tp-callsign">---</div>
@@ -247,41 +262,48 @@
 
 <div id="footer">
   <span><span id="status-dot"></span><span id="status-text">CONNECTING...</span></span>
-  <span>HOVER: INFO &nbsp;|&nbsp; CLICK: TRACK &nbsp;|&nbsp; SCROLL: ZOOM</span>
+  <span>HOVER: INFO &nbsp;|&nbsp; CLICK: TRACK &nbsp;|&nbsp; SCROLL/+−: ZOOM &nbsp;|&nbsp; ESC: UNTRACK</span>
   <span>
     ALT:
     <span style="color:rgb(160,255,30)">&#9632;</span> &lt;5k &nbsp;
     <span style="color:rgb(0,255,65)">&#9632;</span> 5-18k &nbsp;
     <span style="color:rgb(0,230,180)">&#9632;</span> 18-35k &nbsp;
     <span style="color:rgb(180,255,255)">&#9632;</span> 35k+
-    &nbsp;|&nbsp;
-    <button id="filter-btn">GND FILTER: OFF</button>
+  </span>
+  <span>
+    ZOOM:
+    <button class="zoom-btn" data-nm="25">25</button>
+    <button class="zoom-btn" data-nm="52">52</button>
+    <button class="zoom-btn" data-nm="100">100</button>
+    <button class="zoom-btn" data-nm="200">200</button>
+    NM
+  </span>
+  <span>
+    <button id="filter-btn" class="ctrl-btn">GND FILTER: OFF</button>
     &nbsp;
-    <button id="ping-btn" class="active" style="cursor:pointer;padding:1px 6px;border:1px solid #00ff41;background:transparent;color:#00ff41;font-family:'Courier New',monospace;font-size:10px;letter-spacing:1px;">PING: ON</button>
+    <button id="ping-btn" class="ctrl-btn active">PING: ON</button>
   </span>
 </div>
 
 <script>
 // ============================================================
-// CONFIGURATION - UPDATE THESE VALUES
+// CONFIGURATION
 // ============================================================
-// Nearby airports (within ~200NM of Salem, UT)
 const AIRPORTS = [
-  { icao: 'KSLC', iata: 'SLC', name: 'Salt Lake City Intl',    lat: 40.7884, lon: -111.9778, major: true  },
-  { icao: 'KPVU', iata: 'PVU', name: 'Provo Municipal',        lat: 40.2192, lon: -111.7229, major: false },
-  { icao: 'KOGD', iata: 'OGD', name: 'Ogden-Hinckley',         lat: 41.1959, lon: -112.0122, major: false },
-  { icao: 'KCDC', iata: 'CDC', name: 'Cedar City Regional',    lat: 37.7010, lon: -113.0986, major: false },
-  { icao: 'KVEL', iata: 'VEL', name: 'Vernal Regional',        lat: 40.4409, lon: -109.5100, major: false },
-  { icao: 'KPUC', iata: 'PUC', name: 'Carbon County/Price',    lat: 39.6139, lon: -110.7506, major: false },
-  { icao: 'KCNY', iata: 'CNY', name: 'Canyonlands Field',      lat: 38.7553, lon: -109.7549, major: false },
-  { icao: 'KU42', iata: 'U42', name: 'Nephi Municipal',        lat: 39.7108, lon: -111.8783, major: false },
-  { icao: 'KU77', iata: 'U77', name: 'Spanish Fork Airport',   lat: 40.1530, lon: -111.6455, major: false },
-  { icao: 'KENV', iata: 'ENV', name: 'Wendover Airport',       lat: 40.7187, lon: -114.0308, major: false },
-  { icao: 'KPGA', iata: 'PGA', name: 'Page Municipal',         lat: 36.9261, lon: -111.4483, major: false },
-  { icao: 'KPSP', iata: 'SGU', name: 'St George Regional',     lat: 37.0363, lon: -113.5100, major: false },
+  { icao: 'KSLC', iata: 'SLC', name: 'Salt Lake City Intl',  lat: 40.7884, lon: -111.9778, major: true  },
+  { icao: 'KPVU', iata: 'PVU', name: 'Provo Municipal',      lat: 40.2192, lon: -111.7229, major: false },
+  { icao: 'KOGD', iata: 'OGD', name: 'Ogden-Hinckley',       lat: 41.1959, lon: -112.0122, major: false },
+  { icao: 'KCDC', iata: 'CDC', name: 'Cedar City Regional',  lat: 37.7010, lon: -113.0986, major: false },
+  { icao: 'KVEL', iata: 'VEL', name: 'Vernal Regional',      lat: 40.4409, lon: -109.5100, major: false },
+  { icao: 'KPUC', iata: 'PUC', name: 'Carbon County/Price',  lat: 39.6139, lon: -110.7506, major: false },
+  { icao: 'KCNY', iata: 'CNY', name: 'Canyonlands Field',    lat: 38.7553, lon: -109.7549, major: false },
+  { icao: 'KU42', iata: 'U42', name: 'Nephi Municipal',      lat: 39.7108, lon: -111.8783, major: false },
+  { icao: 'KU77', iata: 'U77', name: 'Spanish Fork Airport', lat: 40.1530, lon: -111.6455, major: false },
+  { icao: 'KENV', iata: 'ENV', name: 'Wendover Airport',     lat: 40.7187, lon: -114.0308, major: false },
+  { icao: 'KPGA', iata: 'PGA', name: 'Page Municipal',       lat: 36.9261, lon: -111.4483, major: false },
+  { icao: 'KPSP', iata: 'SGU', name: 'St George Regional',   lat: 37.0363, lon: -113.5100, major: false },
 ];
 
-// Airline ICAO prefix -> full name
 const AIRLINES = {
   'AAL': 'American Airlines',   'ASA': 'Alaska Airlines',
   'DAL': 'Delta Air Lines',     'UAL': 'United Airlines',
@@ -312,16 +334,15 @@ const AIRLINES = {
   'MAS': 'Malaysia Airlines',
 };
 
-// Altitude -> RGB color (stays in green family, shifts toward white at high altitude)
+// Altitude -> RGB color
 function altRgb(alt) {
-  if (alt == null || alt < 0)   return [0,   255,  65];  // default green
-  if (alt < 5000)               return [160, 255,  30];  // low: yellow-green (GA/approach)
-  if (alt < 18000)              return [0,   255,  65];  // mid-low: classic green
-  if (alt < 35000)              return [0,   230, 180];  // mid: teal
-  return                               [180, 255, 255];  // high cruise: near white
+  if (alt == null || alt < 0) return [0,   255,  65];
+  if (alt < 5000)             return [160, 255,  30];
+  if (alt < 18000)            return [0,   255,  65];
+  if (alt < 35000)            return [0,   230, 180];
+  return                             [180, 255, 255];
 }
 
-// Emergency squawk codes
 const SQUAWK_EMERGENCY = {
   '7700': { label: 'EMERGENCY',     color: [255, 40,  40]  },
   '7600': { label: 'RADIO FAILURE', color: [255, 160, 0]   },
@@ -329,69 +350,59 @@ const SQUAWK_EMERGENCY = {
 };
 
 const CONFIG = {
-  // Salem, Utah
   lat: 40.0577,
   lon: -111.6724,
-
-  // Proxy on this server
   dataUrl: '/data/aircraft.json',
-
-  // Display range in nautical miles (radius shown on radar)
   rangeNm: 52,
-
-  // How often to fetch new data (milliseconds)
   fetchInterval: 2000,
-
-  // Sweep speed: seconds for one full 360° rotation
   sweepPeriod: 6,
-
-  // How many degrees wide the sweep glow is
   sweepWidth: 35,
-
-  // Aircraft blip fade time (should match sweepPeriod for realistic fade)
   blipFadeSeconds: 7,
-
-  // Show blips that are beyond range (as dim edge markers)
   showBeyondRange: false,
-
-  // Minimum altitude filter (feet) - set 0 for all
   minAlt: 0,
 };
 // ============================================================
 
 const canvas = document.getElementById('radar');
-const ctx = canvas.getContext('2d');
+const ctx    = canvas.getContext('2d');
 const tooltip = document.getElementById('tooltip');
 
-const EARTH_NM = 3440.065; // Earth radius in nautical miles
-const DEG = Math.PI / 180;
+const EARTH_NM = 3440.065;
+const DEG      = Math.PI / 180;
 
-let aircraft = [];
-let blipState    = {}; // hex -> { time, bloomTime }
-let trailHistory = {}; // hex -> [{x, y}, ...] in NM offsets, newest last
-const TRAIL_MAX  = 30;
-let sweepAngle   = -Math.PI / 2;
+let aircraft      = [];
+let blipState     = {};  // hex -> { time, bloomTime }
+let trailHistory  = {};  // hex -> [{x,y}] NM offsets
+const TRAIL_MAX   = 30;
+let sweepAngle    = -Math.PI / 2;
 let lastSweepAngle = -Math.PI / 2;
-let hoverAircraft  = null;
-let trackedHex     = null;
-let filterGround   = false;
-let pingEnabled    = true;
+let hoverAircraft = null;
+let trackedHex    = null;
+let filterGround  = false;
+let pingEnabled   = true;
 let mouseX = 0, mouseY = 0;
 let lastFetch = 0;
 
-// Audio
+// Session best stats (persist until page reload)
+let sessionMaxAlt  = { alt: 0,   label: '---' };
+let sessionFastest = { speed: 0, label: '---' };
+
+// Track which hexes have already triggered the emergency alarm
+const emergencyAlerted = new Set();
+
+// ── Audio ──────────────────────────────────────────────────
 let audioCtx = null;
 function initAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
+
 function playPing() {
   if (!pingEnabled) return;
   try {
     initAudio();
     const osc  = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    osc.connect(gain); gain.connect(audioCtx.destination);
     osc.type = 'sine';
     osc.frequency.setValueAtTime(900, audioCtx.currentTime);
     osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.4);
@@ -402,15 +413,34 @@ function playPing() {
   } catch(e) {}
 }
 
-// Canvas sizing
+// Harsh three-burst alarm for emergency squawk
+function playEmergencyAlarm() {
+  try {
+    initAudio();
+    for (let i = 0; i < 3; i++) {
+      const osc  = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'square';
+      const t = audioCtx.currentTime + i * 0.28;
+      osc.frequency.setValueAtTime(880, t);
+      osc.frequency.setValueAtTime(440, t + 0.12);
+      gain.gain.setValueAtTime(0.13, t);
+      gain.gain.setValueAtTime(0.0,  t + 0.25);
+      osc.start(t);
+      osc.stop(t + 0.25);
+    }
+  } catch(e) {}
+}
+
+// ── Canvas sizing ──────────────────────────────────────────
 function resize() {
   const headerH = document.getElementById('header').offsetHeight;
   const footerH = document.getElementById('footer').offsetHeight;
-  const available = Math.min(
+  const size = Math.floor(Math.min(
     window.innerWidth,
     window.innerHeight - headerH - footerH
-  ) - 20;
-  const size = Math.floor(available);
+  ) - 20);
   canvas.width = size;
   canvas.height = size;
 }
@@ -420,41 +450,36 @@ window.addEventListener('resize', resize);
 // Scroll to zoom
 window.addEventListener('wheel', (e) => {
   e.preventDefault();
-  const delta = e.deltaY > 0 ? 1.1 : 0.9;
-  CONFIG.rangeNm = Math.max(20, Math.min(400, CONFIG.rangeNm * delta));
-  document.getElementById('stat-range').textContent = Math.round(CONFIG.rangeNm) + 'NM';
+  CONFIG.rangeNm = Math.max(20, Math.min(400, CONFIG.rangeNm * (e.deltaY > 0 ? 1.1 : 0.9)));
 }, { passive: false });
 
-// Coordinate conversion: lat/lon -> NM offsets from center
+// ── Coordinate helpers ─────────────────────────────────────
 function latLonToNm(lat, lon) {
   const dLat = (lat - CONFIG.lat) * DEG;
   const dLon = (lon - CONFIG.lon) * DEG;
-  const x = EARTH_NM * dLon * Math.cos(CONFIG.lat * DEG); // East
-  const y = -EARTH_NM * dLat;                              // South (screen down)
-  return { x, y };
+  return {
+    x:  EARTH_NM * dLon * Math.cos(CONFIG.lat * DEG),
+    y: -EARTH_NM * dLat,
+  };
 }
 
-// NM offsets -> canvas pixels
 function nmToCanvas(x, y) {
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2;
+  const cx = canvas.width / 2, cy = canvas.height / 2;
   const scale = (canvas.width / 2) / CONFIG.rangeNm;
   return { px: cx + x * scale, py: cy + y * scale };
 }
 
-// Distance from center in NM
 function distNm(lat, lon) {
   const { x, y } = latLonToNm(lat, lon);
   return Math.sqrt(x * x + y * y);
 }
 
-// Bearing from center to aircraft in radians (0 = up/north, clockwise)
 function bearingRad(lat, lon) {
   const { x, y } = latLonToNm(lat, lon);
-  return Math.atan2(x, -y); // clockwise from north
+  return Math.atan2(x, -y);
 }
 
-// Fetch aircraft data
+// ── Data fetch ─────────────────────────────────────────────
 async function fetchAircraft() {
   try {
     const res = await fetch(CONFIG.dataUrl, { cache: 'no-store' });
@@ -467,55 +492,120 @@ async function fetchAircraft() {
       return true;
     });
 
-    // Record trail positions
     const seen = new Set();
     aircraft.forEach(a => {
       seen.add(a.hex);
+
+      // Trail history
       const pt = latLonToNm(a.lat, a.lon);
       if (!trailHistory[a.hex]) trailHistory[a.hex] = [];
       const trail = trailHistory[a.hex];
-      // Only add if aircraft has moved meaningfully (> 0.05 NM)
-      const last = trail[trail.length - 1];
+      const last  = trail[trail.length - 1];
       if (!last || Math.hypot(pt.x - last.x, pt.y - last.y) > 0.05) {
         trail.push(pt);
         if (trail.length > TRAIL_MAX) trail.shift();
       }
+
+      // Session best stats
+      const alt = a.alt_baro ?? a.alt_geom ?? 0;
+      if (alt > sessionMaxAlt.alt) {
+        const tag = (a.flight ? a.flight.trim() : a.hex.toUpperCase());
+        sessionMaxAlt = { alt, label: tag + ' @ ' + alt.toLocaleString() + 'ft' };
+      }
+      const spd = a.gs ?? 0;
+      if (spd > sessionFastest.speed) {
+        const tag = (a.flight ? a.flight.trim() : a.hex.toUpperCase());
+        sessionFastest = { speed: Math.round(spd), label: tag + ' @ ' + Math.round(spd) + 'kt' };
+      }
+
+      // Emergency squawk alarm (fires once per hex until they leave range)
+      if (SQUAWK_EMERGENCY[a.squawk] && !emergencyAlerted.has(a.hex)) {
+        emergencyAlerted.add(a.hex);
+        playEmergencyAlarm();
+      }
     });
+
     // Prune trails for aircraft no longer visible
     Object.keys(trailHistory).forEach(hex => {
       if (!seen.has(hex)) delete trailHistory[hex];
     });
+    // Clear emergency flag so we re-alarm if they return
+    [...emergencyAlerted].forEach(hex => {
+      if (!seen.has(hex)) emergencyAlerted.delete(hex);
+    });
 
-    fetchOk = true;
-    document.getElementById('status-dot').className = '';
+    document.getElementById('status-dot').className    = '';
     document.getElementById('status-text').textContent = 'LIVE';
-    document.getElementById('stat-count').textContent = aircraft.length;
+    document.getElementById('stat-count').textContent  = aircraft.length;
+    document.getElementById('stat-max-alt').textContent  = sessionMaxAlt.label;
+    document.getElementById('stat-fastest').textContent  = sessionFastest.label;
   } catch (e) {
-    fetchOk = false;
-    document.getElementById('status-dot').className = 'error';
+    document.getElementById('status-dot').className    = 'error';
     document.getElementById('status-text').textContent = 'NO SIGNAL: ' + e.message;
   }
 }
 
-// Draw a single range ring with label
+// ── Drawing helpers ────────────────────────────────────────
 function drawRing(cx, cy, radiusPx, label) {
   ctx.beginPath();
   ctx.arc(cx, cy, radiusPx, 0, Math.PI * 2);
   ctx.strokeStyle = 'rgba(0, 80, 20, 0.5)';
-  ctx.lineWidth = 0.5;
+  ctx.lineWidth   = 0.5;
   ctx.stroke();
-
   if (label) {
     ctx.fillStyle = 'rgba(0, 100, 30, 0.8)';
-    ctx.font = `${Math.max(9, canvas.width * 0.013)}px 'Courier New'`;
+    ctx.font      = `${Math.max(9, canvas.width * 0.013)}px 'Courier New'`;
     ctx.textAlign = 'center';
     ctx.fillText(label, cx, cy - radiusPx + 12);
   }
 }
 
-// Draw the static radar background
+// Azimuth tick marks + degree labels every 30° (skips cardinal labels at 0/90/180/270)
+function drawAzimuthLines(cx, cy, radius) {
+  const fontSize = Math.max(8, canvas.width * 0.011);
+
+  // Minor ticks every 10°
+  for (let deg = 0; deg < 360; deg += 10) {
+    if (deg % 30 === 0) continue;
+    const rad = (deg - 90) * DEG;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0, 65, 18, 0.45)';
+    ctx.lineWidth   = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(cx + (radius - 6)  * Math.cos(rad), cy + (radius - 6)  * Math.sin(rad));
+    ctx.lineTo(cx +  radius       * Math.cos(rad), cy +  radius       * Math.sin(rad));
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Major ticks + labels every 30°
+  for (let deg = 0; deg < 360; deg += 30) {
+    const rad = (deg - 90) * DEG;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0, 130, 45, 0.7)';
+    ctx.lineWidth   = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx + (radius - 14) * Math.cos(rad), cy + (radius - 14) * Math.sin(rad));
+    ctx.lineTo(cx +  radius       * Math.cos(rad), cy +  radius       * Math.sin(rad));
+    ctx.stroke();
+
+    // Skip degree labels at cardinal directions (N/S/E/W already drawn)
+    if (deg % 90 !== 0) {
+      const lx = cx + (radius - 26) * Math.cos(rad);
+      const ly = cy + (radius - 26) * Math.sin(rad);
+      ctx.font         = `${fontSize}px 'Courier New'`;
+      ctx.fillStyle    = 'rgba(0, 155, 55, 0.75)';
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(deg.toString().padStart(3, '0'), lx, ly);
+      ctx.textBaseline = 'alphabetic';
+    }
+    ctx.restore();
+  }
+}
+
 function drawBackground(cx, cy, radius) {
-  // Outer boundary fill
+  // Dark green fill
   ctx.beginPath();
   ctx.arc(cx, cy, radius, 0, Math.PI * 2);
   ctx.fillStyle = '#000d00';
@@ -529,21 +619,17 @@ function drawBackground(cx, cy, radius) {
   ctx.fill();
 
   // Range rings
-  const ringIntervals = CONFIG.rangeNm <= 60  ? [10, 20, 30, 40, 50, 60] :
-                        CONFIG.rangeNm <= 120 ? [25, 50, 75, 100] :
-                        CONFIG.rangeNm <= 200 ? [50, 100, 150, 200] :
-                                               [50, 100, 150, 200, 250, 300, 350, 400];
-
+  const ringIntervals =
+    CONFIG.rangeNm <= 60  ? [10, 20, 30, 40, 50, 60] :
+    CONFIG.rangeNm <= 120 ? [25, 50, 75, 100] :
+    CONFIG.rangeNm <= 200 ? [50, 100, 150, 200] :
+                            [50, 100, 150, 200, 250, 300, 350, 400];
   const scale = radius / CONFIG.rangeNm;
-  ringIntervals.forEach(nm => {
-    if (nm <= CONFIG.rangeNm) {
-      drawRing(cx, cy, nm * scale, nm + 'NM');
-    }
-  });
+  ringIntervals.forEach(nm => { if (nm <= CONFIG.rangeNm) drawRing(cx, cy, nm * scale, nm + 'NM'); });
 
   // Cross hairs
   ctx.strokeStyle = 'rgba(0, 80, 20, 0.35)';
-  ctx.lineWidth = 0.5;
+  ctx.lineWidth   = 0.5;
   ctx.setLineDash([4, 8]);
   ctx.beginPath(); ctx.moveTo(cx, cy - radius); ctx.lineTo(cx, cy + radius); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(cx - radius, cy); ctx.lineTo(cx + radius, cy); ctx.stroke();
@@ -551,12 +637,12 @@ function drawBackground(cx, cy, radius) {
 
   // Cardinal labels
   const labelSize = Math.max(11, canvas.width * 0.016);
-  ctx.font = `bold ${labelSize}px 'Courier New'`;
+  ctx.font      = `bold ${labelSize}px 'Courier New'`;
   ctx.textAlign = 'center';
   ctx.fillStyle = 'rgba(0, 180, 50, 0.7)';
   const pad = labelSize + 4;
-  ctx.fillText('N', cx, cy - radius + pad);
-  ctx.fillText('S', cx, cy + radius - 4);
+  ctx.fillText('N', cx,          cy - radius + pad);
+  ctx.fillText('S', cx,          cy + radius - 4);
   ctx.fillText('E', cx + radius - 4, cy + labelSize / 3);
   ctx.fillText('W', cx - radius + 4, cy + labelSize / 3);
 
@@ -564,8 +650,11 @@ function drawBackground(cx, cy, radius) {
   ctx.beginPath();
   ctx.arc(cx, cy, radius, 0, Math.PI * 2);
   ctx.strokeStyle = 'rgba(0, 150, 40, 0.6)';
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth   = 1.5;
   ctx.stroke();
+
+  // Azimuth marks on the border
+  drawAzimuthLines(cx, cy, radius);
 
   // Center dot
   ctx.beginPath();
@@ -574,89 +663,61 @@ function drawBackground(cx, cy, radius) {
   ctx.fill();
 }
 
-// Draw airports on the radar
 function drawAirports(cx, cy) {
   const fontSize = Math.max(9, canvas.width * 0.013);
-
   AIRPORTS.forEach(ap => {
     const { x, y } = latLonToNm(ap.lat, ap.lon);
-    const dist = Math.sqrt(x * x + y * y);
-    if (dist > CONFIG.rangeNm * 1.02) return;
-
+    if (Math.sqrt(x * x + y * y) > CONFIG.rangeNm * 1.02) return;
     const { px, py } = nmToCanvas(x, y);
     const isMajor = ap.major;
-
-    // Fixed minimum screen size so nearby airports are always legible
     const r    = isMajor ? 9 : 7;
     const arm  = r + (isMajor ? 5 : 4);
-    const color      = isMajor ? 'rgba(0, 220, 90, 0.85)' : 'rgba(0, 180, 70, 0.80)';
-    const glowColor  = isMajor ? 'rgba(0, 255, 80, 0.3)'  : 'rgba(0, 200, 70, 0.2)';
-
+    const color = isMajor ? 'rgba(0, 220, 90, 0.85)' : 'rgba(0, 180, 70, 0.80)';
     ctx.save();
-
-    // Glow
     ctx.shadowColor = color;
     ctx.shadowBlur  = isMajor ? 8 : 5;
-
-    // Outer circle
-    ctx.beginPath();
-    ctx.arc(px, py, r, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2);
     ctx.strokeStyle = color;
     ctx.lineWidth   = isMajor ? 1.8 : 1.3;
     ctx.stroke();
-
-    // Cross arms
     ctx.lineWidth = isMajor ? 1.4 : 1.1;
     ctx.beginPath(); ctx.moveTo(px - arm, py); ctx.lineTo(px + arm, py); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(px, py - arm); ctx.lineTo(px, py + arm); ctx.stroke();
-
-    ctx.shadowBlur = 0;
-
-    // Label
-    ctx.font      = `${isMajor ? 'bold ' : ''}${fontSize}px 'Courier New'`;
-    ctx.fillStyle = color;
-    ctx.textAlign = 'left';
+    ctx.shadowBlur  = 0;
+    ctx.font        = `${isMajor ? 'bold ' : ''}${fontSize}px 'Courier New'`;
+    ctx.fillStyle   = color;
+    ctx.textAlign   = 'left';
     ctx.fillText(ap.iata, px + arm + 4, py + fontSize * 0.38);
-
     ctx.restore();
   });
 }
 
-// Draw the rotating sweep
 function drawSweep(cx, cy, radius, angle) {
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, radius, angle - CONFIG.sweepWidth * DEG, angle, false);
   ctx.lineTo(cx, cy);
   ctx.closePath();
-
-  const grad = ctx.createConicalGradient
-    ? null  // Not widely supported
-    : null;
-
-  // Use a radial gradient approximation instead
   const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-  g.addColorStop(0, 'rgba(0, 255, 65, 0.05)');
+  g.addColorStop(0,   'rgba(0, 255, 65, 0.05)');
   g.addColorStop(0.6, 'rgba(0, 255, 65, 0.12)');
-  g.addColorStop(1, 'rgba(0, 255, 65, 0.06)');
+  g.addColorStop(1,   'rgba(0, 255, 65, 0.06)');
   ctx.fillStyle = g;
   ctx.fill();
   ctx.restore();
 
-  // Leading edge line (bright)
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(cx, cy);
   ctx.lineTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle));
   ctx.strokeStyle = 'rgba(0, 255, 65, 0.9)';
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth   = 1.5;
   ctx.shadowColor = '#00ff41';
-  ctx.shadowBlur = 8;
+  ctx.shadowBlur  = 8;
   ctx.stroke();
   ctx.restore();
 }
 
-// Draw historical trail for an aircraft
 function drawTrail(trail, blipBrightness, rgb) {
   if (trail.length < 2) return;
   const [r, g, b] = rgb;
@@ -665,142 +726,202 @@ function drawTrail(trail, blipBrightness, rgb) {
     const { px: x1, py: y1 } = nmToCanvas(trail[i - 1].x, trail[i - 1].y);
     const { px: x2, py: y2 } = nmToCanvas(trail[i].x, trail[i].y);
     const ageFraction = i / trail.length;
-    const alpha = ageFraction * ageFraction * blipBrightness * 0.6;
     ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
-    ctx.lineWidth = Math.max(0.5, ageFraction * 1.5);
+    ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+    ctx.strokeStyle = `rgba(${r},${g},${b},${ageFraction * ageFraction * blipBrightness * 0.6})`;
+    ctx.lineWidth   = Math.max(0.5, ageFraction * 1.5);
     ctx.stroke();
   }
   ctx.restore();
 }
 
-// Draw heading vector (line extending forward in direction of travel)
 function drawHeadingVector(px, py, track, speed, brightness, rgb) {
   if (track == null || speed == null || speed < 10) return;
   const [r, g, b] = rgb;
-  // 3 minutes of travel at current speed
   const vectorNm = speed * (3 / 60);
-  const scale = (canvas.width / 2) / CONFIG.rangeNm;
+  const scale    = (canvas.width / 2) / CONFIG.rangeNm;
   const lengthPx = Math.max(12, vectorNm * scale);
-  const angle = (track - 90) * DEG; // canvas angle (0=right, north=up)
-  const ex = px + Math.cos(angle) * lengthPx;
-  const ey = py + Math.sin(angle) * lengthPx;
-
+  const angle    = (track - 90) * DEG;
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(px, py);
-  ctx.lineTo(ex, ey);
+  ctx.lineTo(px + Math.cos(angle) * lengthPx, py + Math.sin(angle) * lengthPx);
   ctx.strokeStyle = `rgba(${r},${g},${b},${brightness * 0.75})`;
-  ctx.lineWidth = 1.2;
+  ctx.lineWidth   = 1.2;
   ctx.setLineDash([3, 3]);
   ctx.stroke();
   ctx.setLineDash([]);
   ctx.restore();
 }
 
-// Draw a single aircraft blip
+// Draw rotated aircraft silhouette based on ADS-B category
+function drawAircraftShape(px, py, track, category, rgb, brightness) {
+  if (track == null) return;
+  const [r, g, b] = rgb;
+  const alpha = Math.max(0.45, brightness);
+  const rot   = (track - 90) * DEG;
+  const cat   = (category || '').toUpperCase();
+
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.rotate(rot);
+  ctx.strokeStyle = `rgba(${r},${g},${b},${alpha})`;
+  ctx.lineWidth   = 1.1;
+  ctx.shadowColor = `rgb(${r},${g},${b})`;
+  ctx.shadowBlur  = 3;
+
+  if (cat === 'B1') {
+    // Helicopter: circle + cross
+    const s = 4.5;
+    ctx.beginPath(); ctx.arc(0, 0, s, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-s * 1.4, 0); ctx.lineTo(s * 1.4, 0);
+    ctx.moveTo(0, -s * 1.4); ctx.lineTo(0, s * 1.4);
+    ctx.stroke();
+  } else if (cat === 'A1' || cat === 'A2') {
+    // Light GA: diamond
+    const s = 5;
+    ctx.beginPath();
+    ctx.moveTo(0, -s); ctx.lineTo(s * 0.65, 0);
+    ctx.lineTo(0, s);  ctx.lineTo(-s * 0.65, 0);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(${r},${g},${b},${alpha * 0.25})`;
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    // Commercial / heavy: top-down plane silhouette
+    const s = 6;
+    ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(0, s * 0.95); ctx.stroke();     // fuselage
+    ctx.beginPath(); ctx.moveTo(-s * 1.2, -s * 0.05); ctx.lineTo(s * 1.2, -s * 0.05); ctx.stroke(); // wings
+    ctx.beginPath(); ctx.moveTo(-s * 0.5, s * 0.72);  ctx.lineTo(s * 0.5, s * 0.72);  ctx.stroke(); // tail
+  }
+  ctx.restore();
+}
+
+// Draw ↑/↓ vertical-rate arrow to the right of blip
+function drawVertRateArrow(px, py, baro_rate, brightness) {
+  if (baro_rate == null || Math.abs(baro_rate) < 200) return;
+  const up  = baro_rate > 0;
+  const col = up ? `rgba(0,255,130,${brightness * 0.9})` : `rgba(255,140,0,${brightness * 0.9})`;
+  const sz  = Math.max(7, canvas.width * 0.009);
+  const ax  = px + canvas.width * 0.018;
+
+  ctx.save();
+  ctx.strokeStyle = col;
+  ctx.fillStyle   = col;
+  ctx.lineWidth   = 1.3;
+  ctx.shadowColor = col;
+  ctx.shadowBlur  = 4;
+
+  // Shaft
+  ctx.beginPath();
+  ctx.moveTo(ax, py + (up ? sz * 0.5 : -sz * 0.5));
+  ctx.lineTo(ax, py + (up ? -sz * 0.5 : sz * 0.5));
+  ctx.stroke();
+
+  // Arrowhead
+  ctx.beginPath();
+  if (up) {
+    ctx.moveTo(ax,              py - sz * 0.5);
+    ctx.lineTo(ax - sz * 0.35, py - sz * 0.1);
+    ctx.lineTo(ax + sz * 0.35, py - sz * 0.1);
+  } else {
+    ctx.moveTo(ax,              py + sz * 0.5);
+    ctx.lineTo(ax - sz * 0.35, py + sz * 0.1);
+    ctx.lineTo(ax + sz * 0.35, py + sz * 0.1);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawBlip(px, py, brightness, isHovered, rgb, emergency, bloomTime) {
-  const size = canvas.width * 0.007;
+  const size  = canvas.width * 0.007;
   const alpha = Math.max(0.05, brightness);
   const [r, g, b] = rgb;
-
-  // Phosphor bloom — bright white flash when sweep first hits
-  const bloomAge = bloomTime ? (Date.now() - bloomTime) / 1000 : 99;
+  const bloomAge   = bloomTime ? (Date.now() - bloomTime) / 1000 : 99;
   const bloomAlpha = bloomAge < 0.15 ? Math.max(0, 1 - bloomAge / 0.15) : 0;
 
   ctx.save();
 
   if (emergency) {
-    // Pulsing emergency ring
     const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 180);
     const [er, eg, eb] = emergency.color;
-    ctx.beginPath();
-    ctx.arc(px, py, size * 3.5, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.arc(px, py, size * 3.5, 0, Math.PI * 2);
     ctx.strokeStyle = `rgba(${er},${eg},${eb},${pulse * 0.9})`;
-    ctx.lineWidth = 2;
+    ctx.lineWidth   = 2;
     ctx.shadowColor = `rgb(${er},${eg},${eb})`;
-    ctx.shadowBlur = 16 * pulse;
+    ctx.shadowBlur  = 16 * pulse;
     ctx.stroke();
-    ctx.shadowBlur = 0;
+    ctx.shadowBlur  = 0;
   }
 
   if (isHovered) {
-    ctx.beginPath();
-    ctx.arc(px, py, size * 2.5, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.arc(px, py, size * 2.5, 0, Math.PI * 2);
     ctx.strokeStyle = `rgba(${r},${g},${b},0.5)`;
-    ctx.lineWidth = 1;
+    ctx.lineWidth   = 1;
     ctx.stroke();
   }
 
-  // Outer glow
   ctx.shadowColor = `rgb(${r},${g},${b})`;
-  ctx.shadowBlur = 10 * alpha;
-
-  // Blip dot
-  ctx.beginPath();
-  ctx.arc(px, py, size, 0, Math.PI * 2);
+  ctx.shadowBlur  = 10 * alpha;
+  ctx.beginPath(); ctx.arc(px, py, size, 0, Math.PI * 2);
   ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
   ctx.fill();
 
-  // Bright center
-  ctx.shadowBlur = 0;
-  ctx.beginPath();
-  ctx.arc(px, py, size * 0.4, 0, Math.PI * 2);
+  ctx.shadowBlur  = 0;
+  ctx.beginPath(); ctx.arc(px, py, size * 0.4, 0, Math.PI * 2);
   ctx.fillStyle = `rgba(220,255,230,${Math.min(1, alpha * 1.5)})`;
   ctx.fill();
 
-  // Phosphor bloom flash
   if (bloomAlpha > 0) {
     ctx.shadowColor = '#ffffff';
-    ctx.shadowBlur = 20 * bloomAlpha;
-    ctx.beginPath();
-    ctx.arc(px, py, size * 2.5 * bloomAlpha, 0, Math.PI * 2);
+    ctx.shadowBlur  = 20 * bloomAlpha;
+    ctx.beginPath(); ctx.arc(px, py, size * 2.5 * bloomAlpha, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(255,255,255,${bloomAlpha * 0.9})`;
     ctx.fill();
-    ctx.shadowBlur = 0;
+    ctx.shadowBlur  = 0;
   }
-
   ctx.restore();
 }
 
-// Main render loop
+// Format vertical rate for HTML insertion
+function fmtVrate(baro_rate) {
+  if (baro_rate == null) return null;
+  const abs = Math.abs(baro_rate);
+  if (abs < 200) return '<span style="color:#005518">── LVL</span>';
+  const up  = baro_rate > 0;
+  const col = up ? '#00ff80' : '#ff9933';
+  return `<span style="color:${col}">${up ? '↑' : '↓'} ${abs.toLocaleString()} fpm</span>`;
+}
+
+// ── Main render loop ───────────────────────────────────────
 let lastTime = 0;
 function render(ts) {
   const dt = Math.min((ts - lastTime) / 1000, 0.1);
   lastTime = ts;
 
-  // Advance sweep
   lastSweepAngle = sweepAngle;
-  sweepAngle += (2 * Math.PI / CONFIG.sweepPeriod) * dt;
-  // Ping when sweep crosses north (-π/2)
-  const NORTH = -Math.PI / 2;
+  sweepAngle    += (2 * Math.PI / CONFIG.sweepPeriod) * dt;
+  const NORTH    = -Math.PI / 2;
   if (lastSweepAngle < NORTH && sweepAngle >= NORTH) playPing();
   if (sweepAngle > Math.PI) sweepAngle -= 2 * Math.PI;
 
-  // Fetch new data periodically
-  if (ts - lastFetch > CONFIG.fetchInterval) {
-    lastFetch = ts;
-    fetchAircraft();
-  }
+  if (ts - lastFetch > CONFIG.fetchInterval) { lastFetch = ts; fetchAircraft(); }
 
-  // Update time display
+  // Time displays
   const now = new Date();
   document.getElementById('stat-time').textContent =
     now.getUTCHours().toString().padStart(2, '0') + ':' +
     now.getUTCMinutes().toString().padStart(2, '0') + ':' +
     now.getUTCSeconds().toString().padStart(2, '0');
+  document.getElementById('stat-local').textContent =
+    now.toLocaleTimeString('en-US', { timeZone: 'America/Denver', hour12: false });
   document.getElementById('stat-range').textContent = Math.round(CONFIG.rangeNm) + 'NM';
 
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2;
-  const radius = canvas.width / 2;
-
-  // Clear
+  const cx = canvas.width / 2, cy = canvas.height / 2, radius = canvas.width / 2;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Clip to circle
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, radius - 1, 0, Math.PI * 2);
@@ -809,69 +930,62 @@ function render(ts) {
   drawBackground(cx, cy, radius - 1);
   drawAirports(cx, cy);
 
-  // Check which aircraft are being swept over
+  // Detect which aircraft the sweep is currently passing over
   aircraft.forEach(a => {
     const bearing = bearingRad(a.lat, a.lon);
     const angDiff = ((sweepAngle - bearing + 3 * Math.PI) % (2 * Math.PI)) - Math.PI;
-
     if (angDiff >= 0 && angDiff < CONFIG.sweepWidth * DEG) {
-      const now = Date.now();
+      const t    = Date.now();
       const prev = blipState[a.hex];
-      // Only bloom on the leading edge (first hit)
-      const bloom = (!prev || now - prev.time > 500);
-      blipState[a.hex] = { time: now, bloomTime: bloom ? now : (prev?.bloomTime || 0) };
+      const bloom = (!prev || t - prev.time > 500);
+      blipState[a.hex] = { time: t, bloomTime: bloom ? t : (prev?.bloomTime || 0) };
     }
   });
 
-  // Draw sweep
   drawSweep(cx, cy, radius - 1, sweepAngle);
 
-  // Draw aircraft blips
   hoverAircraft = null;
   aircraft.forEach(a => {
     const nm = distNm(a.lat, a.lon);
     if (!CONFIG.showBeyondRange && nm > CONFIG.rangeNm) return;
 
-    const { x, y } = latLonToNm(a.lat, a.lon);
-    const { px, py } = nmToCanvas(x, y);
+    const { x, y }   = latLonToNm(a.lat, a.lon);
+    const { px, py }  = nmToCanvas(x, y);
 
     const state = blipState[a.hex];
     let brightness = 0.08;
     if (state) {
-      const age = (Date.now() - state.time) / 1000;
-      brightness = Math.max(0.08, 1 - (age / CONFIG.blipFadeSeconds));
+      brightness = Math.max(0.08, 1 - ((Date.now() - state.time) / 1000) / CONFIG.blipFadeSeconds);
     }
 
-    // Altitude color
-    const rgb = altRgb(a.alt_baro ?? a.alt_geom);
-
-    // Emergency squawk
+    const rgb       = altRgb(a.alt_baro ?? a.alt_geom);
     const emergency = SQUAWK_EMERGENCY[a.squawk] || null;
 
-    // Check hover
     const dx = mouseX - px, dy = mouseY - py;
     const hitRadius = Math.max(14, canvas.width * 0.025);
     const isHovered = Math.sqrt(dx * dx + dy * dy) < hitRadius;
     if (isHovered) hoverAircraft = { a, px, py, rgb, emergency };
 
-    // Trail
     if (trailHistory[a.hex]) drawTrail(trailHistory[a.hex], brightness, rgb);
-
-    // Heading vector
     drawHeadingVector(px, py, a.track, a.gs, brightness, rgb);
 
-    // Blip
     const bloomTime = blipState[a.hex]?.bloomTime || 0;
     const isTracked = a.hex === trackedHex;
     drawBlip(px, py, brightness, isHovered || isTracked, rgb, emergency, bloomTime);
 
-    // Tracked ring
+    // Aircraft shape silhouette on top of glow
+    drawAircraftShape(px, py, a.track, a.category, rgb, brightness);
+
+    // Vertical rate arrows
+    drawVertRateArrow(px, py, a.baro_rate, brightness);
+
+    // Tracked dashed ring
     if (isTracked) {
       ctx.save();
       ctx.beginPath();
       ctx.arc(px, py, canvas.width * 0.02, 0, Math.PI * 2);
       ctx.strokeStyle = 'rgba(0,255,65,0.5)';
-      ctx.lineWidth = 1;
+      ctx.lineWidth   = 1;
       ctx.setLineDash([4, 4]);
       ctx.stroke();
       ctx.setLineDash([]);
@@ -882,25 +996,25 @@ function render(ts) {
     if (brightness > 0.5 && a.flight) {
       const [r, g, b] = rgb;
       ctx.save();
-      ctx.font = `${Math.max(9, canvas.width * 0.012)}px 'Courier New'`;
-      ctx.fillStyle = `rgba(${r},${g},${b},${brightness * 0.8})`;
+      ctx.font        = `${Math.max(9, canvas.width * 0.012)}px 'Courier New'`;
+      ctx.fillStyle   = `rgba(${r},${g},${b},${brightness * 0.8})`;
       ctx.shadowColor = `rgb(${r},${g},${b})`;
-      ctx.shadowBlur = 3;
-      ctx.textAlign = 'left';
+      ctx.shadowBlur  = 3;
+      ctx.textAlign   = 'left';
       ctx.fillText(a.flight.trim(), px + 8, py - 4);
       ctx.restore();
     }
 
-    // Emergency label — always visible regardless of sweep
+    // Emergency label
     if (emergency) {
       const [er, eg, eb] = emergency.color;
       const pulse = 0.6 + 0.4 * Math.sin(Date.now() / 200);
       ctx.save();
-      ctx.font = `bold ${Math.max(9, canvas.width * 0.012)}px 'Courier New'`;
-      ctx.fillStyle = `rgba(${er},${eg},${eb},${pulse})`;
+      ctx.font        = `bold ${Math.max(9, canvas.width * 0.012)}px 'Courier New'`;
+      ctx.fillStyle   = `rgba(${er},${eg},${eb},${pulse})`;
       ctx.shadowColor = `rgb(${er},${eg},${eb})`;
-      ctx.shadowBlur = 6;
-      ctx.textAlign = 'left';
+      ctx.shadowBlur  = 6;
+      ctx.textAlign   = 'left';
       ctx.fillText(`⚠ ${emergency.label}`, px + 10, py + 14);
       ctx.restore();
     }
@@ -908,57 +1022,64 @@ function render(ts) {
 
   ctx.restore(); // end clip
 
-  // Update tracked panel
+  // ── Tracked panel update ───────────────────────────────
   const trackedAircraft = trackedHex ? aircraft.find(a => a.hex === trackedHex) : null;
   const panel = document.getElementById('tracked-panel');
   if (trackedAircraft) {
-    const ta = trackedAircraft;
+    const ta        = trackedAircraft;
     const tCallsign = ta.flight ? ta.flight.trim() : ta.hex.toUpperCase();
-    const tPrefix = ta.flight ? ta.flight.trim().replace(/[0-9].*$/, '') : null;
-    const tAirline = tPrefix && AIRLINES[tPrefix] ? AIRLINES[tPrefix] : '';
-    const tAlt  = ta.alt_baro != null ? ta.alt_baro.toLocaleString() + ' ft' : '---';
-    const tSpd  = ta.gs != null ? Math.round(ta.gs) + ' kt' : '---';
-    const tHdg  = ta.track != null ? Math.round(ta.track) + '°' : '---';
-    const tNm   = distNm(ta.lat, ta.lon).toFixed(1);
-    const tBrg  = ((bearingRad(ta.lat, ta.lon) / DEG + 360) % 360).toFixed(0);
-    const tTyp  = ta.t || ta.r || '---';
+    const tPrefix   = ta.flight ? ta.flight.trim().replace(/[0-9].*$/, '') : null;
+    const tAirline  = tPrefix && AIRLINES[tPrefix] ? AIRLINES[tPrefix] : '';
+    const tAlt      = ta.alt_baro != null ? ta.alt_baro.toLocaleString() + ' ft' : '---';
+    const tSpd      = ta.gs  != null ? Math.round(ta.gs)  + ' kt' : '---';
+    const tHdg      = ta.track != null ? Math.round(ta.track) + '°' : '---';
+    const tNm       = distNm(ta.lat, ta.lon).toFixed(1);
+    const tBrg      = ((bearingRad(ta.lat, ta.lon) / DEG + 360) % 360).toFixed(0);
+    const tTyp      = ta.t || ta.r || '---';
+    const tVrate    = fmtVrate(ta.baro_rate);
     const [tr, tg, tb] = altRgb(ta.alt_baro ?? ta.alt_geom);
+
+    // Only show FlightAware link when we have a real callsign
+    const hasCallsign = ta.flight && ta.flight.trim();
+    const faLink = hasCallsign
+      ? `<a class="tp-fa-link" href="https://flightaware.com/live/flight/${ta.flight.trim()}" target="_blank">&#8599; FLIGHTAWARE</a>`
+      : '';
+
     document.getElementById('tp-callsign').textContent = tCallsign;
     document.getElementById('tp-callsign').style.color = `rgb(${tr},${tg},${tb})`;
-    document.getElementById('tp-airline').textContent = tAirline;
+    document.getElementById('tp-airline').textContent  = tAirline;
     document.getElementById('tp-body').innerHTML = `
       <div><span class="tp-label">TYPE&nbsp;&nbsp;&nbsp;</span>${tTyp}</div>
       <div><span class="tp-label">ICAO&nbsp;&nbsp;&nbsp;</span>${ta.hex.toUpperCase()}</div>
       <div><span class="tp-label">ALT&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:rgb(${tr},${tg},${tb})">${tAlt}</span></div>
+      <div><span class="tp-label">VRATE&nbsp;&nbsp;</span>${tVrate ?? '---'}</div>
       <div><span class="tp-label">SPEED&nbsp;&nbsp;</span>${tSpd}</div>
       <div><span class="tp-label">HDG&nbsp;&nbsp;&nbsp;&nbsp;</span>${tHdg}</div>
       <div><span class="tp-label">DIST&nbsp;&nbsp;&nbsp;</span>${tNm} NM / ${tBrg}°</div>
       <div><span class="tp-label">SQUAWK&nbsp;</span>${ta.squawk || '---'}</div>
+      ${faLink}
     `;
     panel.style.display = 'block';
   } else if (trackedHex) {
-    // Aircraft left range
     trackedHex = null;
     panel.style.display = 'none';
   }
 
-  // Tooltip
+  // ── Tooltip ────────────────────────────────────────────
   if (hoverAircraft) {
     const { a, px, py, rgb, emergency } = hoverAircraft;
-    const nm = distNm(a.lat, a.lon).toFixed(1);
+    const nm      = distNm(a.lat, a.lon).toFixed(1);
     const bearing = ((bearingRad(a.lat, a.lon) / DEG + 360) % 360).toFixed(0);
-    const alt = a.alt_baro != null ? a.alt_baro.toLocaleString() + ' ft' : (a.alt_geom != null ? a.alt_geom.toLocaleString() + ' ft (geo)' : '---');
-    const speed = a.gs != null ? Math.round(a.gs) + ' kt' : '---';
-    const squawk = a.squawk || '---';
-    const acType = a.t || '';
-
-    // Airline lookup from callsign prefix
+    const alt     = a.alt_baro != null ? a.alt_baro.toLocaleString() + ' ft'
+                  : (a.alt_geom != null ? a.alt_geom.toLocaleString() + ' ft (geo)' : '---');
+    const speed   = a.gs != null ? Math.round(a.gs) + ' kt' : '---';
     const callsign = a.flight ? a.flight.trim() : null;
-    const prefix = callsign ? callsign.replace(/[0-9].*$/, '') : null;
-    const airline = prefix && AIRLINES[prefix] ? AIRLINES[prefix] : null;
-
+    const prefix   = callsign ? callsign.replace(/[0-9].*$/, '') : null;
+    const airline  = prefix && AIRLINES[prefix] ? AIRLINES[prefix] : null;
+    const acType   = a.t || '';
+    const vrate    = fmtVrate(a.baro_rate);
     const [r, g, b] = rgb;
-    const altColor = `rgb(${r},${g},${b})`;
+    const altColor  = `rgb(${r},${g},${b})`;
     const emergencyBar = emergency
       ? `<div style="background:rgba(${emergency.color[0]},${emergency.color[1]},${emergency.color[2]},0.2);border:1px solid rgba(${emergency.color[0]},${emergency.color[1]},${emergency.color[2]},0.8);color:rgb(${emergency.color[0]},${emergency.color[1]},${emergency.color[2]});padding:2px 6px;margin-bottom:5px;font-weight:bold;letter-spacing:2px;">⚠ ${emergency.label}</div>`
       : '';
@@ -967,26 +1088,26 @@ function render(ts) {
       ${emergencyBar}
       <div class="tt-callsign" style="color:${altColor};text-shadow:0 0 6px ${altColor};">${callsign || a.hex.toUpperCase()}</div>
       ${airline ? `<div style="color:#00cc44;font-size:10px;margin-bottom:3px;">${airline}</div>` : ''}
-      ${acType ? `<div style="color:#006620;font-size:9px;margin-bottom:3px;letter-spacing:1px;">${acType}</div>` : ''}
+      ${acType  ? `<div style="color:#006620;font-size:9px;margin-bottom:3px;letter-spacing:1px;">${acType}</div>` : ''}
       <div><span class="tt-label">ICAO&nbsp;&nbsp;&nbsp;</span>${a.hex.toUpperCase()}</div>
       <div><span class="tt-label">ALT&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:${altColor}">${alt}</span></div>
+      ${vrate ? `<div><span class="tt-label">VRATE&nbsp;&nbsp;</span>${vrate}</div>` : ''}
       <div><span class="tt-label">SPEED&nbsp;&nbsp;</span>${speed}</div>
       <div><span class="tt-label">DIST&nbsp;&nbsp;&nbsp;</span>${nm} NM / ${bearing}°</div>
-      <div><span class="tt-label">SQUAWK&nbsp;</span>${squawk}</div>
+      <div><span class="tt-label">SQUAWK&nbsp;</span>${a.squawk || '---'}</div>
       ${a.track != null ? `<div><span class="tt-label">HDG&nbsp;&nbsp;&nbsp;&nbsp;</span>${Math.round(a.track)}°</div>` : ''}
       <div style="color:#004410;font-size:9px;margin-top:4px;">CLICK TO TRACK</div>
     `;
     tooltip.style.display = 'block';
 
-    // Position tooltip, keep in viewport
-    const tw = 200, th = 140;
+    const tw = 200, th = 170;
     let tx = px + canvas.getBoundingClientRect().left + 18;
-    let ty = py + canvas.getBoundingClientRect().top - 70;
-    if (tx + tw > window.innerWidth) tx -= tw + 36;
-    if (ty < 0) ty = 10;
-    if (ty + th > window.innerHeight) ty = window.innerHeight - th - 10;
+    let ty = py + canvas.getBoundingClientRect().top  - 70;
+    if (tx + tw > window.innerWidth)  tx -= tw + 36;
+    if (ty < 0)                       ty  = 10;
+    if (ty + th > window.innerHeight) ty  = window.innerHeight - th - 10;
     tooltip.style.left = tx + 'px';
-    tooltip.style.top = ty + 'px';
+    tooltip.style.top  = ty + 'px';
   } else {
     tooltip.style.display = 'none';
   }
@@ -994,24 +1115,22 @@ function render(ts) {
   requestAnimationFrame(render);
 }
 
-// Mouse tracking
+// ── Event listeners ────────────────────────────────────────
 canvas.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX - canvas.getBoundingClientRect().left;
-  mouseY = e.clientY - canvas.getBoundingClientRect().top;
+  const r = canvas.getBoundingClientRect();
+  mouseX = e.clientX - r.left;
+  mouseY = e.clientY - r.top;
 });
 canvas.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
 
-// Click to track
 canvas.addEventListener('click', (e) => {
-  initAudio(); // unblock audio context on first interaction
-  const cx = canvas.getBoundingClientRect().left;
-  const cy = canvas.getBoundingClientRect().top;
-  const mx = e.clientX - cx, my = e.clientY - cy;
+  initAudio();
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
   const hitRadius = Math.max(14, canvas.width * 0.025);
   let closest = null, closestDist = Infinity;
   aircraft.forEach(a => {
-    const nm = distNm(a.lat, a.lon);
-    if (nm > CONFIG.rangeNm) return;
+    if (distNm(a.lat, a.lon) > CONFIG.rangeNm) return;
     const { x, y } = latLonToNm(a.lat, a.lon);
     const { px, py } = nmToCanvas(x, y);
     const d = Math.hypot(mx - px, my - py);
@@ -1023,13 +1142,11 @@ canvas.addEventListener('click', (e) => {
   }
 });
 
-// Close tracked panel
 document.getElementById('tp-close').addEventListener('click', () => {
   trackedHex = null;
   document.getElementById('tracked-panel').style.display = 'none';
 });
 
-// Ground filter toggle
 const filterBtn = document.getElementById('filter-btn');
 filterBtn.addEventListener('click', () => {
   filterGround = !filterGround;
@@ -1037,19 +1154,47 @@ filterBtn.addEventListener('click', () => {
   filterBtn.classList.toggle('active', filterGround);
 });
 
-// Ping toggle
 const pingBtn = document.getElementById('ping-btn');
 pingBtn.addEventListener('click', () => {
   pingEnabled = !pingEnabled;
   pingBtn.textContent = `PING: ${pingEnabled ? 'ON' : 'OFF'}`;
-  pingBtn.style.color = pingEnabled ? '#00ff41' : '#006620';
-  pingBtn.style.borderColor = pingEnabled ? '#00ff41' : '#003a10';
+  pingBtn.classList.toggle('active', pingEnabled);
 });
 
-// Initial fetch then start render
-fetchAircraft().then(() => {
-  requestAnimationFrame(render);
+// Quick-zoom presets
+document.querySelectorAll('.zoom-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    CONFIG.rangeNm = parseInt(btn.dataset.nm);
+    document.querySelectorAll('.zoom-btn').forEach(b => b.classList.remove('zoom-active'));
+    btn.classList.add('zoom-active');
+  });
 });
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  switch (e.key) {
+    case 'Escape':
+      trackedHex = null;
+      document.getElementById('tracked-panel').style.display = 'none';
+      break;
+    case '+': case '=':
+      CONFIG.rangeNm = Math.max(20, CONFIG.rangeNm * 0.83);
+      break;
+    case '-': case '_':
+      CONFIG.rangeNm = Math.min(400, CONFIG.rangeNm * 1.2);
+      break;
+    case 'g': case 'G':
+      filterBtn.click();
+      break;
+    case 'p': case 'P':
+      pingBtn.click();
+      break;
+  }
+});
+
+// Initial fetch + start render loop
+fetchAircraft().then(() => requestAnimationFrame(render));
 </script>
 </body>
 </html>
